@@ -56,7 +56,7 @@
 
     <div class="mb-6">
       <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 block">Clé de licence</label>
-      <input type="text" id="license-input" maxlength="19" placeholder="SGP-XXXX-XXXX-XXXX"
+      <input type="text" id="license-input" maxlength="35" placeholder="XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX"
         class="w-full px-4 py-3.5 text-sm" oninput="formatLicenseInput(this)" onkeydown="if(event.key==='Enter')activateLicense()"/>
       <p id="license-error" class="text-red-400 text-xs mt-2 hidden">Clé invalide. Vérifiez votre email Gumroad.</p>
     </div>
@@ -289,21 +289,18 @@ function fnv32(str) {
 }
 
 function validateKey(raw) {
-  const key = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
-  if (key.length !== 16) return false;
-  if (!key.startsWith('SGP')) return false;
-  const a = key.slice(3, 7);
-  const b = key.slice(7, 11);
-  const check = key.slice(11, 15);
-  const expected = fnv32(a + b + LICENSE_SALT).slice(0, 4);
-  return check === expected;
+  // Accept Gumroad format: XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX (32 hex chars + 3 dashes)
+  const key = raw.trim().toUpperCase();
+  const gumroadPattern = /^[0-9A-F]{8}-[0-9A-F]{8}-[0-9A-F]{8}-[0-9A-F]{8}$/;
+  return gumroadPattern.test(key);
 }
 
 function formatLicenseInput(el) {
-  let v = el.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-  if (v.length > 15) v = v.slice(0, 15);
-  // Format as SGP-XXXX-XXXX-XXXX
-  const parts = [v.slice(0,3), v.slice(3,7), v.slice(7,11), v.slice(11,15)].filter(Boolean);
+  // Allow hex characters and dashes, auto-uppercase
+  let v = el.value.toUpperCase().replace(/[^A-F0-9-]/g, '');
+  // Remove all dashes then re-insert at correct positions
+  const hex = v.replace(/-/g, '').slice(0, 32);
+  const parts = [hex.slice(0,8), hex.slice(8,16), hex.slice(16,24), hex.slice(24,32)].filter(Boolean);
   el.value = parts.join('-');
   document.getElementById('license-error').classList.add('hidden');
 }
