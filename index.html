@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Study Grade Predictor — by nague</title>
+  <meta name="description" content="Track your study time, monitor your progress, and get an accurate prediction of your final grade. One-time payment of €5."/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *{font-family:'Inter',sans-serif;scroll-behavior:smooth}
+    .font-display{font-family:'Playfair Display',serif}
+    body{background:#06060d;color:#e2e8f0;overflow-x:hidden}
+    .gradient-text{background:linear-gradient(135deg,#a78bfa,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .glow-btn{background:linear-gradient(135deg,#7c3aed,#0891b2);box-shadow:0 0 32px rgba(124,58,237,.45);transition:all .25s}
+    .glow-btn:hover{box-shadow:0 0 48px rgba(124,58,237,.7);transform:translateY(-2px) scale(1.02)}
+    .glow-btn:active{transform:translateY(0) scale(1)}
+    .glass{background:rgba(255,255,255,.04);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08)}
+    .glass-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);transition:all .25s}
+    .glass-card:hover{background:rgba(255,255,255,.06);border-color:rgba(139,92,246,.3);transform:translateY(-4px)}
+    .noise{background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none}
+    .hero-glow{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,.18) 0%,transparent 70%);pointer-events:none}
+    .grade-badge{background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(6,182,212,.1));border:1px solid rgba(16,185,129,.3)}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    .float{animation:float 4s ease-in-out infinite}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .7s ease both}
+    .delay-1{animation-delay:.1s}.delay-2{animation-delay:.2s}.delay-3{animation-delay:.3s}.delay-4{animation-delay:.4s}
+    @keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(124,58,237,.4)}70%{box-shadow:0 0 0 20px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+    .pulse-ring{animation:pulse-ring 2s ease infinite}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(124,58,237,.4);border-radius:3px}
+    .faq-item{border-bottom:1px solid rgba(255,255,255,.06)}
+    .faq-btn{width:100%;text-align:left;padding:1.25rem 0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;color:#cbd5e1;font-size:.95rem;font-weight:500}
+    .faq-content{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease}
+    .faq-content.open{max-height:200px;padding-bottom:1rem}
+    .faq-icon{transition:transform .3s;flex-shrink:0;margin-left:1rem}
+    .faq-item.open .faq-icon{transform:rotate(45deg)}
+    .nav-link{color:#94a3b8;font-size:.9rem;font-weight:500;transition:color .2s}
+    .nav-link:hover{color:#c4b5fd}
+    .mobile-menu{transition:all .35s;max-height:0;overflow:hidden}
+    .mobile-menu.open{max-height:400px}
+    .badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);color:#c4b5fd;padding:.3rem .9rem;border-radius:9999px;font-size:.8rem;font-weight:600}
+  </style>
+</head>
+<body>
+
+<div class="noise fixed inset-0 z-0 pointer-events-none"></div>
+
+<!-- NAV -->
+<nav class="glass sticky top-0 z-50 px-4 sm:px-8 py-4">
+  <div class="max-w-6xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg glow-btn flex items-center justify-center text-white font-black text-sm select-none">SG</div>
+      <span class="font-display text-lg text-white">Study Grade <span class="gradient-text">Predictor</span></span>
+    </div>
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#how" class="nav-link">How it works</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="#faq" class="nav-link">FAQ</a>
+    </div>
+    <div class="hidden md:flex items-center gap-3">
+      <a href="app.html" class="text-slate-400 text-sm font-medium hover:text-white transition px-3 py-1.5">Sign in →</a>
+      <a href="#pricing" class="glow-btn text-white text-sm font-semibold px-5 py-2.5 rounded-xl">Buy — €5</a>
+    </div>
+    <button onclick="toggleMenu()" class="md:hidden text-slate-400 hover:text-white p-1" aria-label="menu">
+      <svg id="icon-menu" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <svg id="icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div id="mobile-menu" class="mobile-menu md:hidden">
+    <div class="max-w-6xl mx-auto flex flex-col gap-4 pt-4 pb-2">
+      <a href="#features" onclick="toggleMenu()" class="nav-link">Features</a>
+      <a href="#how" onclick="toggleMenu()" class="nav-link">How it works</a>
+      <a href="#pricing" onclick="toggleMenu()" class="nav-link">Pricing</a>
+      <a href="#faq" onclick="toggleMenu()" class="nav-link">FAQ</a>
+      <a href="#pricing" class="glow-btn text-white text-sm font-semibold px-5 py-2.5 rounded-xl text-center mt-2">Buy — €5</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="relative min-h-screen flex items-center justify-center px-4 py-24 overflow-hidden">
+  <div class="hero-glow top-0 left-1/4 -translate-x-1/2 -top-32 z-0"></div>
+  <div class="hero-glow bottom-0 right-1/4 translate-x-1/2 z-0 opacity-60"></div>
+  <div class="max-w-4xl mx-auto text-center z-10">
+    <div class="badge mb-6 fade-up">✦ One-time payment · No subscription</div>
+    <h1 class="font-display text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 fade-up delay-1">
+      Take control of your<br/><span class="gradient-text">academic success</span>
+    </h1>
+    <p class="text-slate-400 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed fade-up delay-2">
+      Track your study time, log your results, and get an <strong class="text-slate-200">accurate grade prediction</strong> on the official 1.0 – 4.0 scale — before you even sit the exam.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 fade-up delay-3">
+      <a href="#pricing" class="glow-btn pulse-ring text-white font-bold px-8 py-4 rounded-2xl text-lg w-full sm:w-auto">
+        Get access — <span class="line-through opacity-50 text-base">€15</span> €5
+      </a>
+      <a href="app.html" class="glass text-slate-300 font-medium px-8 py-4 rounded-2xl text-base hover:text-white hover:border-violet-500/40 transition w-full sm:w-auto text-center">
+        Try the demo →
+      </a>
+    </div>
+
+    <!-- MOCK UI PREVIEW -->
+    <div class="float fade-up delay-4">
+      <div class="glass rounded-3xl p-1 max-w-3xl mx-auto shadow-2xl" style="box-shadow:0 0 80px rgba(124,58,237,.2)">
+        <div class="rounded-2xl overflow-hidden bg-[#0a0a14] p-5">
+          <div class="grid grid-cols-4 gap-2 mb-4">
+            <div class="bg-violet-900/30 border border-violet-500/20 rounded-xl p-2.5 text-center">
+              <div class="text-violet-400 font-bold text-lg">3</div>
+              <div class="text-slate-600 text-xs">Subjects</div>
+            </div>
+            <div class="bg-cyan-900/20 border border-cyan-500/20 rounded-xl p-2.5 text-center">
+              <div class="text-cyan-400 font-bold text-lg">42h</div>
+              <div class="text-slate-600 text-xs">Total time</div>
+            </div>
+            <div class="bg-emerald-900/20 border border-emerald-500/20 rounded-xl p-2.5 text-center">
+              <div class="text-emerald-400 font-bold text-lg">78%</div>
+              <div class="text-slate-600 text-xs">Avg. score</div>
+            </div>
+            <div class="bg-amber-900/20 border border-amber-500/20 rounded-xl p-2.5 text-center">
+              <div class="text-amber-400 font-bold text-lg">2.1h</div>
+              <div class="text-slate-600 text-xs">Today</div>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div class="bg-slate-900/60 border border-white/5 rounded-xl p-3 text-center col-span-1">
+              <div class="text-xs text-slate-500 mb-1">Predicted grade</div>
+              <div class="text-2xl font-bold text-emerald-400">1.7</div>
+              <div class="text-xs text-emerald-600">Good</div>
+              <div class="w-full bg-slate-800 rounded-full h-1 mt-2">
+                <div class="h-1 rounded-full bg-emerald-500" style="width:83%"></div>
+              </div>
+            </div>
+            <div class="bg-slate-900/60 border border-white/5 rounded-xl p-3 text-center col-span-1">
+              <svg viewBox="0 0 100 100" class="w-12 h-12 mx-auto -rotate-90">
+                <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="10"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#10b981" stroke-width="10" stroke-dasharray="215 238.8" stroke-linecap="round"/>
+              </svg>
+              <div class="text-xs text-slate-500 -mt-1">Pass chance</div>
+              <div class="text-emerald-400 font-bold text-sm">90%</div>
+            </div>
+            <div class="bg-slate-900/60 border border-white/5 rounded-xl p-3 col-span-1 flex flex-col justify-center gap-1.5">
+              <div class="text-xs text-slate-600">Time</div>
+              <div class="w-full bg-slate-800 rounded-full h-1"><div class="h-1 bg-cyan-500 rounded-full" style="width:70%"></div></div>
+              <div class="text-xs text-slate-600">Score</div>
+              <div class="w-full bg-slate-800 rounded-full h-1"><div class="h-1 bg-violet-500 rounded-full" style="width:85%"></div></div>
+              <div class="text-xs text-slate-600">Consistency</div>
+              <div class="w-full bg-slate-800 rounded-full h-1"><div class="h-1 bg-amber-500 rounded-full" style="width:60%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF STRIP -->
+<div class="glass border-y border-white/5 py-5 px-4">
+  <div class="max-w-4xl mx-auto flex flex-wrap justify-center gap-8 text-center">
+    <div><div class="text-2xl font-bold text-white">1.0 → 4.0</div><div class="text-slate-500 text-xs mt-0.5">Official German grade scale</div></div>
+    <div class="hidden sm:block w-px bg-white/10"></div>
+    <div><div class="text-2xl font-bold text-white">3 languages</div><div class="text-slate-500 text-xs mt-0.5">FR · EN · DE</div></div>
+    <div class="hidden sm:block w-px bg-white/10"></div>
+    <div><div class="text-2xl font-bold text-white">100% web</div><div class="text-slate-500 text-xs mt-0.5">Mobile & desktop</div></div>
+    <div class="hidden sm:block w-px bg-white/10"></div>
+    <div><div class="text-2xl font-bold text-white">€5</div><div class="text-slate-500 text-xs mt-0.5">Lifetime access · Once</div></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features" class="py-24 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="badge mb-4">Features</div>
+      <h2 class="font-display text-3xl sm:text-5xl font-bold text-white mb-4">Everything you need<br/><span class="gradient-text">to succeed</span></h2>
+      <p class="text-slate-400 max-w-xl mx-auto">A complete tool that turns your study habits into concrete data and reliable grade predictions.</p>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div class="glass-card rounded-2xl p-6">
+        <div class="w-11 h-11 rounded-xl bg-violet-500/15 flex items-center justify-center text-2xl mb-4">⏱️</div>
+        <h3 class="font-semibold text-white mb-2">Session timer</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">Built-in stopwatch with a time goal, progress bar, and modes: Study / Practice / Review / Mock exam.</p>
+      </div>
+      <div class="glass-card rounded-2xl p-6">
+        <div class="w-11 h-11 rounded-xl bg-cyan-500/15 flex items-center justify-center text-2xl mb-4">🎯</div>
+        <h3 class="font-semibold text-white mb-2">Score tracking</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">Log quizzes, exercises, mock exams and self-assessments. Progress updates automatically (time 60% + score 40%).</p>
+      </div>
+      <div class="glass-card rounded-2xl p-6">
+        <div class="w-11 h-11 rounded-xl bg-emerald-500/15 flex items-center justify-center text-2xl mb-4">🔮</div>
+        <h3 class="font-semibold text-white mb-2">Grade prediction</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">Sigmoid algorithm predicting your grade on the official scale: 1.0 · 1.3 · 1.7 · 2.0 · 2.3 · 2.7 · 3.0 · 3.3 · 3.7 · 4.0.</p>
+      </div>
+      <div class="glass-card rounded-2xl p-6">
+        <div class="w-11 h-11 rounded-xl bg-amber-500/15 flex items-center justify-center text-2xl mb-4">📊</div>
+        <h3 class="font-semibold text-white mb-2">Visual analytics</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">Interactive charts: time per subject, predicted grades, last 7 days of activity — all at a glance.</p>
+      </div>
+      <div class="glass-card rounded-2xl p-6">
+        <div class="w-11 h-11 rounded-xl bg-pink-500/15 flex items-center justify-center text-2xl mb-4">🌍</div>
+        <h3 class="font-semibold text-white mb-2">3 languages</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">Full interface in English, Français and Deutsch. Switch in one click, remembered automatically.</p>
+      </div>
+      <div class="glass-card rounded-2xl p-6">
+        <div class="w-11 h-11 rounded-xl bg-indigo-500/15 flex items-center justify-center text-2xl mb-4">📱</div>
+        <h3 class="font-semibold text-white mb-2">Mobile & desktop</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">Fully responsive web app. Works perfectly on smartphone, tablet and computer. No installation needed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="py-24 px-4 relative">
+  <div class="hero-glow left-0 top-1/2 -translate-y-1/2 opacity-40"></div>
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="badge mb-4">Simple & fast</div>
+      <h2 class="font-display text-3xl sm:text-5xl font-bold text-white mb-4">3 steps to see<br/><span class="gradient-text">your predicted grade</span></h2>
+    </div>
+    <div class="grid sm:grid-cols-3 gap-8">
+      <div class="text-center">
+        <div class="w-16 h-16 rounded-2xl glow-btn flex items-center justify-center text-white font-bold text-2xl mx-auto mb-5">1</div>
+        <h3 class="font-semibold text-white mb-2">Add a subject</h3>
+        <p class="text-slate-500 text-sm">Name, category, difficulty, target hours, and exam date.</p>
+      </div>
+      <div class="text-center">
+        <div class="w-16 h-16 rounded-2xl glow-btn flex items-center justify-center text-white font-bold text-2xl mx-auto mb-5">2</div>
+        <h3 class="font-semibold text-white mb-2">Study & log</h3>
+        <p class="text-slate-500 text-sm">Start a timer, finish the session, record your scores.</p>
+      </div>
+      <div class="text-center">
+        <div class="w-16 h-16 rounded-2xl glow-btn flex items-center justify-center text-white font-bold text-2xl mx-auto mb-5">3</div>
+        <h3 class="font-semibold text-white mb-2">Read your prediction</h3>
+        <p class="text-slate-500 text-sm">Predicted grade, pass probability, and improvement factors.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GRADE SCALE -->
+<section class="py-16 px-4">
+  <div class="max-w-3xl mx-auto">
+    <div class="glass rounded-3xl p-8 text-center">
+      <div class="badge mb-5 mx-auto w-fit">Official grade scale</div>
+      <h3 class="font-display text-2xl font-bold text-white mb-6">All recognised grades</h3>
+      <div class="flex flex-wrap justify-center gap-3">
+        <div class="grade-badge px-4 py-2 rounded-xl text-center"><div class="text-emerald-400 font-bold text-lg">1.0</div><div class="text-slate-500 text-xs">Sehr gut</div></div>
+        <div class="grade-badge px-4 py-2 rounded-xl text-center"><div class="text-emerald-400 font-bold text-lg">1.3</div><div class="text-slate-500 text-xs">Sehr gut</div></div>
+        <div class="grade-badge px-4 py-2 rounded-xl text-center"><div class="text-emerald-400 font-bold text-lg">1.7</div><div class="text-slate-500 text-xs">Gut</div></div>
+        <div class="grade-badge px-4 py-2 rounded-xl text-center"><div class="text-cyan-400 font-bold text-lg">2.0</div><div class="text-slate-500 text-xs">Gut</div></div>
+        <div class="grade-badge px-4 py-2 rounded-xl text-center"><div class="text-cyan-400 font-bold text-lg">2.3</div><div class="text-slate-500 text-xs">Gut</div></div>
+        <div class="grade-badge px-4 py-2 rounded-xl text-center"><div class="text-cyan-400 font-bold text-lg">2.7</div><div class="text-slate-500 text-xs">Befriedigend</div></div>
+        <div class="grade-badge px-4 py-2 rounded-xl text-center"><div class="text-amber-400 font-bold text-lg">3.0</div><div class="text-slate-500 text-xs">Befriedigend</div></div>
+        <div class="grade-badge px-4 py-2 rounded-xl text-center"><div class="text-amber-400 font-bold text-lg">3.3</div><div class="text-slate-500 text-xs">Befriedigend</div></div>
+        <div class="grade-badge px-4 py-2 rounded-xl text-center"><div class="text-amber-400 font-bold text-lg">3.7</div><div class="text-slate-500 text-xs">Ausreichend</div></div>
+        <div class="px-4 py-2 rounded-xl text-center bg-orange-500/10 border border-orange-500/25">
+          <div class="text-orange-400 font-bold text-lg">4.0</div><div class="text-slate-500 text-xs">Min. to pass ✓</div>
+        </div>
+      </div>
+      <p class="text-slate-600 text-xs mt-5">Above 4.0 → fail. Our algorithm predicts whether you will cross this threshold.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="py-24 px-4 relative">
+  <div class="hero-glow right-0 top-1/2 -translate-y-1/2 opacity-50"></div>
+  <div class="max-w-lg mx-auto text-center">
+    <div class="badge mb-6 mx-auto w-fit">Pricing</div>
+    <h2 class="font-display text-3xl sm:text-5xl font-bold text-white mb-4">Simple.<br/><span class="gradient-text">€5 one time.</span></h2>
+    <p class="text-slate-400 mb-10">No subscription. No surprises. Lifetime access.</p>
+    <div class="glass rounded-3xl p-8 text-left relative overflow-hidden" style="border-color:rgba(139,92,246,.35)">
+      <div class="absolute top-0 right-0 w-48 h-48 bg-violet-600/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="flex items-start justify-between mb-6">
+        <div>
+          <div class="font-display text-2xl font-bold text-white">Study Grade Predictor</div>
+          <div class="text-slate-500 text-sm mt-0.5">by nague</div>
+        </div>
+        <div class="text-right">
+          <div class="text-slate-500 line-through text-sm">€15</div>
+          <div class="text-4xl font-black gradient-text">€5</div>
+        </div>
+      </div>
+      <ul class="space-y-3 mb-8 text-sm text-slate-300">
+        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Full web app (mobile + desktop)</li>
+        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Unlimited study sessions</li>
+        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Unlimited subjects</li>
+        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Grade prediction (1.0 – 4.0 scale)</li>
+        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Analytics with interactive charts</li>
+        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> 3 languages (EN · FR · DE)</li>
+        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Personal license key</li>
+        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Lifetime access · Updates included</li>
+        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Secure payment via Gumroad</li>
+      </ul>
+      <!-- Replace YOUR_GUMROAD_URL with your actual Gumroad product URL -->
+      <a href="YOUR_GUMROAD_URL" target="_blank" rel="noopener"
+        class="glow-btn block text-center text-white font-bold py-4 rounded-2xl text-lg mb-4">
+        Buy now — €5
+      </a>
+      <p class="text-center text-slate-600 text-xs">Secure payment · Card, PayPal · Receipt by email · VAT included</p>
+    </div>
+    <p class="text-slate-600 text-xs mt-6">Already a customer? <a href="app.html" class="text-violet-400 hover:underline">Access the app →</a></p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="py-20 px-4">
+  <div class="max-w-2xl mx-auto">
+    <div class="text-center mb-12">
+      <div class="badge mb-4 mx-auto w-fit">FAQ</div>
+      <h2 class="font-display text-3xl font-bold text-white">Frequently asked questions</h2>
+    </div>
+    <div class="space-y-0">
+      <div class="faq-item">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          How do I access the app after purchase?
+          <span class="faq-icon text-violet-400 text-xl">+</span>
+        </button>
+        <div class="faq-content text-slate-500 text-sm leading-relaxed">
+          After payment on Gumroad, you immediately receive a <strong class="text-slate-300">unique license key</strong> by email. Go to the app, enter your key on the welcome screen, and you're in — permanent access from any browser.
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          Does the app work on mobile?
+          <span class="faq-icon text-violet-400 text-xl">+</span>
+        </button>
+        <div class="faq-content text-slate-500 text-sm leading-relaxed">
+          Yes, fully. The interface is <strong class="text-slate-300">responsive</strong> and optimised for mobile, tablet and desktop. No installation required — everything runs directly in your browser.
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          Is my data saved?
+          <span class="faq-icon text-violet-400 text-xl">+</span>
+        </button>
+        <div class="faq-content text-slate-500 text-sm leading-relaxed">
+          Your data is stored locally in your browser (localStorage). It persists between sessions. To access it on another device, use the same browser and profile.
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          How does the grade prediction work?
+          <span class="faq-icon text-violet-400 text-xl">+</span>
+        </button>
+        <div class="faq-content text-slate-500 text-sm leading-relaxed">
+          The algorithm analyses 4 factors: study time vs target (35%), average score (40%), session consistency (15%), and recent trend (10%). A sigmoid model converts this into an official grade on the 1.0–4.0 scale.
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          Is there a refund policy?
+          <span class="faq-icon text-violet-400 text-xl">+</span>
+        </button>
+        <div class="faq-content text-slate-500 text-sm leading-relaxed">
+          Yes. Gumroad offers a 30-day refund if the app doesn't meet your expectations. Simply contact support via your Gumroad receipt.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-20 px-4">
+  <div class="max-w-3xl mx-auto text-center">
+    <h2 class="font-display text-3xl sm:text-4xl font-bold text-white mb-4">Ready to master your<br/><span class="gradient-text">academic results?</span></h2>
+    <p class="text-slate-400 mb-8">Join students who drive their success with real data.</p>
+    <a href="#pricing" class="glow-btn inline-block text-white font-bold px-10 py-4 rounded-2xl text-lg">
+      Get access — €5
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="glass border-t border-white/5 py-8 px-4">
+  <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2">
+      <div class="w-6 h-6 rounded-md glow-btn flex items-center justify-center text-white font-black text-xs">SG</div>
+      <span class="text-slate-400 text-sm">Study Grade Predictor <span class="text-slate-600">by</span> <span class="text-violet-400 font-semibold">nague</span></span>
+    </div>
+    <div class="flex items-center gap-6 text-slate-600 text-xs">
+      <a href="app.html" class="hover:text-slate-400 transition">Access the app</a>
+      <span>© 2025 nague. All rights reserved.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+function toggleMenu(){
+  const m=document.getElementById('mobile-menu'),i1=document.getElementById('icon-menu'),i2=document.getElementById('icon-close');
+  m.classList.toggle('open');i1.classList.toggle('hidden');i2.classList.toggle('hidden');
+}
+function toggleFaq(btn){
+  const item=btn.parentElement,content=item.querySelector('.faq-content'),isOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(el=>{el.classList.remove('open');el.querySelector('.faq-content').classList.remove('open');});
+  if(!isOpen){item.classList.add('open');content.classList.add('open');}
+}
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',()=>{
+  const m=document.getElementById('mobile-menu');if(m.classList.contains('open'))toggleMenu();
+}));
+</script>
+</body>
+</html>

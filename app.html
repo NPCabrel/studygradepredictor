@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Study Grade Predictor — App</title>
+  <meta name="theme-color" content="#0a0a0f"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <style>
+    *{font-family:'Inter',sans-serif}
+    .font-display{font-family:'Playfair Display',serif}
+    body{background:#0a0a0f;color:#e2e8f0;overflow-x:hidden}
+    .glass{background:rgba(255,255,255,.04);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08)}
+    .glass-hover:hover{background:rgba(255,255,255,.07);border-color:rgba(139,92,246,.35);transition:all .2s}
+    .gradient-text{background:linear-gradient(135deg,#8b5cf6,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .gradient-btn{background:linear-gradient(135deg,#7c3aed,#0891b2);transition:opacity .2s,transform .1s}
+    .gradient-btn:hover{opacity:.88;transform:translateY(-1px)}
+    .gradient-btn:active{transform:translateY(0)}
+    .progress-bar{background:linear-gradient(90deg,#7c3aed,#06b6d4);transition:width .6s cubic-bezier(.4,0,.2,1)}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(139,92,246,.4);border-radius:3px}
+    .tab-active{background:rgba(139,92,246,.2);border-bottom:2px solid #8b5cf6;color:#c4b5fd}
+    .modal-bg{background:rgba(0,0,0,.75);backdrop-filter:blur(6px)}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeIn .25s ease}
+    @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
+    .pulse-dot{animation:pulse-dot 1.2s infinite}
+    .stat-card{border-left:3px solid}
+    .border-violet{border-color:#8b5cf6}.border-cyan{border-color:#06b6d4}
+    .border-emerald{border-color:#10b981}.border-amber{border-color:#f59e0b}
+    input,select,textarea{background:rgba(255,255,255,.05)!important;border:1px solid rgba(255,255,255,.1)!important;color:#e2e8f0!important;border-radius:8px;outline:none}
+    input:focus,select:focus,textarea:focus{border-color:rgba(139,92,246,.6)!important;box-shadow:0 0 0 3px rgba(139,92,246,.15)}
+    select option{background:#1a1a2e;color:#e2e8f0}
+    .lang-btn{transition:all .15s}
+    .lang-btn.active{background:rgba(139,92,246,.25);color:#c4b5fd;border-color:rgba(139,92,246,.5)}
+    /* LICENSE SCREEN */
+    .license-screen{position:fixed;inset:0;z-index:100;background:#06060d;display:flex;align-items:center;justify-content:center;padding:1rem}
+    .license-glow{position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(124,58,237,.15) 0%,transparent 70%);pointer-events:none}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+    .shake{animation:shake .4s ease}
+    input[type="text"]#license-input{text-transform:uppercase;letter-spacing:.1em;font-size:1.1rem;text-align:center;font-weight:600}
+  </style>
+</head>
+<body class="min-h-screen">
+
+<!-- ═══════════════════════════════════════════════════════
+     LICENSE GATE
+══════════════════════════════════════════════════════════ -->
+<div id="license-screen" class="license-screen">
+  <div class="license-glow"></div>
+  <div class="glass rounded-3xl w-full max-w-md p-8 text-center z-10 fade-in">
+    <div class="w-14 h-14 rounded-2xl gradient-btn flex items-center justify-center text-white font-black text-xl mx-auto mb-5">SG</div>
+    <h1 class="font-display text-2xl font-bold gradient-text mb-1">Study Grade Predictor</h1>
+    <p class="text-slate-500 text-sm mb-8">by <span class="text-violet-400 font-semibold">nague</span></p>
+
+    <div class="mb-6">
+      <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 block">Clé de licence</label>
+      <input type="text" id="license-input" maxlength="19" placeholder="SGP-XXXX-XXXX-XXXX"
+        class="w-full px-4 py-3.5 text-sm" oninput="formatLicenseInput(this)" onkeydown="if(event.key==='Enter')activateLicense()"/>
+      <p id="license-error" class="text-red-400 text-xs mt-2 hidden">Clé invalide. Vérifiez votre email Gumroad.</p>
+    </div>
+
+    <button onclick="activateLicense()" class="gradient-btn w-full py-3.5 rounded-xl text-white font-semibold mb-4">
+      Activer l'accès
+    </button>
+
+    <div class="flex items-center gap-3 my-5">
+      <div class="flex-1 h-px bg-white/8"></div>
+      <span class="text-slate-600 text-xs">Pas encore client ?</span>
+      <div class="flex-1 h-px bg-white/8"></div>
+    </div>
+
+    <a href="index.html" class="block py-3 rounded-xl border border-white/10 text-slate-400 text-sm hover:text-white hover:border-violet-500/40 transition">
+      Voir la page de vente — 5€
+    </a>
+
+    <p class="text-slate-700 text-xs mt-5">La clé vous a été envoyée par email après votre achat sur Gumroad.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN APP (hidden until licensed)
+══════════════════════════════════════════════════════════ -->
+<div id="main-app" class="flex flex-col min-h-screen hidden">
+
+  <!-- NAVBAR -->
+  <nav class="glass sticky top-0 z-40 px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-2.5 shrink-0">
+      <a href="index.html" class="w-8 h-8 rounded-lg gradient-btn flex items-center justify-center text-white font-black text-xs">SG</a>
+      <span class="font-display text-lg gradient-text hidden sm:block">Study Grade Predictor</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="flex gap-1 p-1 glass rounded-lg">
+        <button onclick="setLang('fr')" data-lang="fr" class="lang-btn px-2.5 py-1 rounded-md text-xs font-semibold text-slate-400 border border-transparent">FR</button>
+        <button onclick="setLang('en')" data-lang="en" class="lang-btn px-2.5 py-1 rounded-md text-xs font-semibold text-slate-400 border border-transparent">EN</button>
+        <button onclick="setLang('de')" data-lang="de" class="lang-btn px-2.5 py-1 rounded-md text-xs font-semibold text-slate-400 border border-transparent">DE</button>
+      </div>
+      <span id="nav-date" class="text-slate-500 text-xs hidden xl:block"></span>
+      <button onclick="openAddSubject()" id="btn-add-subject" class="gradient-btn text-white text-sm px-3 py-2 rounded-lg font-medium whitespace-nowrap">+</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="flex-1 p-3 sm:p-6 max-w-7xl mx-auto w-full">
+
+    <div id="hero-stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5"></div>
+
+    <div class="glass rounded-xl mb-5 overflow-hidden">
+      <div class="flex border-b border-white/5 overflow-x-auto">
+        <button onclick="setTab('dashboard')" class="tab-btn px-4 py-3 text-sm font-medium text-slate-400 transition-all whitespace-nowrap" data-tab="dashboard"></button>
+        <button onclick="setTab('subjects')" class="tab-btn px-4 py-3 text-sm font-medium text-slate-400 transition-all whitespace-nowrap" data-tab="subjects"></button>
+        <button onclick="setTab('analytics')" class="tab-btn px-4 py-3 text-sm font-medium text-slate-400 transition-all whitespace-nowrap" data-tab="analytics"></button>
+        <button onclick="setTab('predictions')" class="tab-btn px-4 py-3 text-sm font-medium text-slate-400 transition-all whitespace-nowrap" data-tab="predictions"></button>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div id="tab-dashboard" class="tab-content p-4 sm:p-5 fade-in">
+        <div class="grid md:grid-cols-2 gap-5">
+          <div>
+            <h2 id="lbl-active-session" class="text-base font-semibold mb-3 text-slate-200"></h2>
+            <div id="active-session-panel" class="glass rounded-xl p-5 min-h-[160px] flex flex-col justify-center items-center text-center">
+              <div id="lbl-no-session" class="text-slate-500 text-sm"></div>
+              <div id="lbl-select-hint" class="text-slate-600 text-xs mt-1"></div>
+            </div>
+          </div>
+          <div>
+            <h2 id="lbl-start-session" class="text-base font-semibold mb-3 text-slate-200"></h2>
+            <div class="glass rounded-xl p-4 space-y-3">
+              <select id="session-subject" class="w-full px-3 py-2 text-sm"></select>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label id="lbl-mode" class="text-xs text-slate-500 mb-1 block"></label>
+                  <select id="session-mode" class="w-full px-3 py-2 text-sm"></select>
+                </div>
+                <div>
+                  <label id="lbl-goal" class="text-xs text-slate-500 mb-1 block"></label>
+                  <input type="number" id="session-goal" value="60" min="5" max="480" class="w-full px-3 py-2 text-sm"/>
+                </div>
+              </div>
+              <button onclick="startSession()" id="btn-start-session" class="gradient-btn w-full py-2.5 rounded-lg text-white text-sm font-medium"></button>
+            </div>
+          </div>
+        </div>
+        <div class="mt-5">
+          <h2 id="lbl-recent" class="text-base font-semibold mb-3 text-slate-200"></h2>
+          <div id="recent-sessions" class="space-y-2"></div>
+        </div>
+      </div>
+
+      <!-- SUBJECTS -->
+      <div id="tab-subjects" class="tab-content p-4 sm:p-5 fade-in hidden">
+        <div id="subjects-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        <div id="subjects-empty" class="text-center py-16 hidden">
+          <div class="text-5xl mb-4">📚</div>
+          <div id="lbl-no-subjects" class="text-slate-400 font-medium"></div>
+          <div id="lbl-add-hint" class="text-slate-600 text-sm mt-1"></div>
+          <button onclick="openAddSubject()" id="btn-add-first" class="gradient-btn mt-4 px-6 py-2.5 rounded-lg text-white text-sm font-medium"></button>
+        </div>
+      </div>
+
+      <!-- ANALYTICS -->
+      <div id="tab-analytics" class="tab-content p-4 sm:p-5 fade-in hidden">
+        <div class="grid md:grid-cols-2 gap-5 mb-5">
+          <div class="glass rounded-xl p-4">
+            <h3 id="lbl-chart-time" class="text-sm font-semibold text-slate-300 mb-3"></h3>
+            <canvas id="chart-time" height="220"></canvas>
+          </div>
+          <div class="glass rounded-xl p-4">
+            <h3 id="lbl-chart-grade" class="text-sm font-semibold text-slate-300 mb-3"></h3>
+            <canvas id="chart-progress" height="220"></canvas>
+          </div>
+        </div>
+        <div class="glass rounded-xl p-4">
+          <h3 id="lbl-chart-weekly" class="text-sm font-semibold text-slate-300 mb-3"></h3>
+          <canvas id="chart-weekly" height="120"></canvas>
+        </div>
+      </div>
+
+      <!-- PREDICTIONS -->
+      <div id="tab-predictions" class="tab-content p-4 sm:p-5 fade-in hidden">
+        <div id="predictions-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        <div id="predictions-empty" class="text-center py-16 hidden">
+          <div class="text-5xl mb-4">🔮</div>
+          <div id="lbl-no-pred" class="text-slate-400 font-medium"></div>
+          <div id="lbl-no-pred-hint" class="text-slate-600 text-sm mt-1"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="glass border-t border-white/5 py-3 px-4 text-center">
+    <span class="text-slate-700 text-xs">Study Grade Predictor · by <span class="text-violet-500">nague</span> · <a href="index.html" class="hover:text-slate-500 transition">studygradepredictor.netlify.app</a></span>
+  </footer>
+</div>
+
+<!-- MODAL: ADD SUBJECT -->
+<div id="modal-subject" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
+  <div class="glass rounded-2xl w-full max-w-lg p-6 fade-in max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-5">
+      <h2 id="modal-sub-title" class="text-xl font-semibold gradient-text"></h2>
+      <button onclick="closeModal('modal-subject')" class="text-slate-500 hover:text-slate-300 text-2xl leading-none">&times;</button>
+    </div>
+    <div class="space-y-4">
+      <div><label id="lbl-sub-name" class="text-xs font-medium text-slate-400 mb-1 block"></label>
+        <input type="text" id="sub-name" class="w-full px-3 py-2.5 text-sm"/></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label id="lbl-sub-cat" class="text-xs font-medium text-slate-400 mb-1 block"></label>
+          <select id="sub-category" class="w-full px-3 py-2.5 text-sm"></select></div>
+        <div><label id="lbl-sub-diff" class="text-xs font-medium text-slate-400 mb-1 block"></label>
+          <select id="sub-difficulty" class="w-full px-3 py-2.5 text-sm"></select></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label id="lbl-sub-hours" class="text-xs font-medium text-slate-400 mb-1 block"></label>
+          <input type="number" id="sub-target-hours" value="80" min="1" max="500" class="w-full px-3 py-2.5 text-sm"/></div>
+        <div><label id="lbl-sub-exam" class="text-xs font-medium text-slate-400 mb-1 block"></label>
+          <input type="date" id="sub-exam-date" class="w-full px-3 py-2.5 text-sm"/></div>
+      </div>
+      <div class="glass rounded-xl p-3"><div id="lbl-grade-info" class="text-xs text-slate-500 leading-relaxed"></div></div>
+      <div><label id="lbl-sub-desc" class="text-xs font-medium text-slate-400 mb-1 block"></label>
+        <textarea id="sub-desc" rows="2" class="w-full px-3 py-2.5 text-sm resize-none"></textarea></div>
+    </div>
+    <div class="flex gap-3 mt-5">
+      <button onclick="closeModal('modal-subject')" id="btn-cancel-sub" class="flex-1 py-2.5 rounded-lg border border-white/10 text-slate-400 text-sm hover:text-white transition"></button>
+      <button onclick="saveSubject()" id="btn-save-sub" class="flex-1 gradient-btn py-2.5 rounded-lg text-white text-sm font-medium"></button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SUBJECT DETAIL -->
+<div id="modal-detail" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
+  <div class="glass rounded-2xl w-full max-w-2xl p-6 fade-in max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-5">
+      <h2 id="detail-title" class="text-xl font-semibold gradient-text"></h2>
+      <button onclick="closeModal('modal-detail')" class="text-slate-500 hover:text-slate-300 text-2xl leading-none">&times;</button>
+    </div>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<!-- MODAL: LOG SCORE -->
+<div id="modal-score" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
+  <div class="glass rounded-2xl w-full max-w-md p-6 fade-in">
+    <div class="flex items-center justify-between mb-5">
+      <h2 id="modal-score-title" class="text-xl font-semibold gradient-text"></h2>
+      <button onclick="closeModal('modal-score')" class="text-slate-500 hover:text-slate-300 text-2xl leading-none">&times;</button>
+    </div>
+    <div class="space-y-4">
+      <input type="hidden" id="score-subject-id"/>
+      <div><label id="lbl-score-type" class="text-xs font-medium text-slate-400 mb-2 block"></label>
+        <select id="score-type" class="w-full px-3 py-2.5 text-sm"></select></div>
+      <div>
+        <label id="lbl-score-val" class="text-xs font-medium text-slate-400 mb-2 block"></label>
+        <input type="range" id="score-value" min="0" max="100" value="70"
+          oninput="document.getElementById('score-display').textContent=this.value+'%'" class="w-full accent-violet-500"/>
+        <div class="flex justify-between text-xs text-slate-500 mt-1">
+          <span>0%</span><span id="score-display" class="text-violet-400 font-medium">70%</span><span>100%</span>
+        </div>
+      </div>
+      <div><label id="lbl-score-comment" class="text-xs font-medium text-slate-400 mb-1 block"></label>
+        <textarea id="score-comment" rows="2" class="w-full px-3 py-2.5 text-sm resize-none"></textarea></div>
+    </div>
+    <div class="flex gap-3 mt-5">
+      <button onclick="closeModal('modal-score')" id="btn-cancel-score" class="flex-1 py-2.5 rounded-lg border border-white/10 text-slate-400 text-sm hover:text-white transition"></button>
+      <button onclick="saveScore()" id="btn-save-score" class="flex-1 gradient-btn py-2.5 rounded-lg text-white text-sm font-medium"></button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="fixed bottom-5 right-4 z-50 hidden">
+  <div id="toast-inner" class="glass px-5 py-3 rounded-xl text-sm font-medium text-emerald-400 border border-emerald-500/20 fade-in"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// LICENSE SYSTEM
+// ═══════════════════════════════════════════════════════
+const LICENSE_SALT = 'nague_sgp_2025_x7k';
+
+function fnv32(str) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(16).toUpperCase().padStart(8, '0');
+}
+
+function validateKey(raw) {
+  const key = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (key.length !== 16) return false;
+  if (!key.startsWith('SGP')) return false;
+  const a = key.slice(3, 7);
+  const b = key.slice(7, 11);
+  const check = key.slice(11, 15);
+  const expected = fnv32(a + b + LICENSE_SALT).slice(0, 4);
+  return check === expected;
+}
+
+function formatLicenseInput(el) {
+  let v = el.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (v.length > 15) v = v.slice(0, 15);
+  // Format as SGP-XXXX-XXXX-XXXX
+  const parts = [v.slice(0,3), v.slice(3,7), v.slice(7,11), v.slice(11,15)].filter(Boolean);
+  el.value = parts.join('-');
+  document.getElementById('license-error').classList.add('hidden');
+}
+
+function activateLicense() {
+  const raw = document.getElementById('license-input').value;
+  if (validateKey(raw)) {
+    localStorage.setItem('sgp_license', raw.toUpperCase());
+    document.getElementById('license-screen').style.display = 'none';
+    document.getElementById('main-app').classList.remove('hidden');
+    initApp();
+    toast('✓ Licence activée — Bienvenue !', 'emerald');
+  } else {
+    const errEl = document.getElementById('license-error');
+    errEl.classList.remove('hidden');
+    const inp = document.getElementById('license-input');
+    inp.classList.add('shake');
+    setTimeout(() => inp.classList.remove('shake'), 500);
+  }
+}
+
+function checkLicense() {
+  const stored = localStorage.getItem('sgp_license');
+  if (stored && validateKey(stored)) {
+    document.getElementById('license-screen').style.display = 'none';
+    document.getElementById('main-app').classList.remove('hidden');
+    return true;
+  }
+  return false;
+}
+
+// ═══════════════════════════════════════════════════════
+// TRANSLATIONS
+// ═══════════════════════════════════════════════════════
+const T = {
+  fr: {
+    btnAddSubject:'+ Matière',
+    tabs:['Tableau de bord','Matières','Analytique','Prédictions'],
+    stats:['Matières suivies','Temps total','Score moyen',"Aujourd'hui"],
+    activeSession:'Session active',noSession:'Aucune session en cours',
+    selectHint:'Sélectionnez une matière pour démarrer',
+    startSession:'Démarrer une session',modeLabel:'Mode',goalLabel:'Objectif (min)',
+    btnStart:'Démarrer la session',recent:'Sessions récentes',
+    noSessions:'Aucune session enregistrée',noSubjects:'Aucune matière',
+    addHint:'Ajoutez votre première matière pour commencer',btnAddFirst:'+ Ajouter une matière',
+    chartTime:"Temps d'étude par matière",chartGrade:'Note prédite par matière',
+    chartWeekly:'Activité hebdomadaire (7 derniers jours)',
+    noPred:'Aucune prédiction disponible',noPredHint:'Ajoutez des matières et des sessions pour voir vos prédictions',
+    modalSubTitle:'Nouvelle matière',subName:'Nom de la matière *',subNamePh:'ex : Mathématiques, Droit civil…',
+    subCat:'Catégorie',subDiff:'Difficulté perçue',subHours:'Heures cible totales',
+    subExam:"Date de l'examen",subDesc:'Description / objectifs',subDescPh:'Chapitres couverts, objectifs…',
+    gradeInfo:'⚖️ Barème : 1,0 = meilleure note · 4,0 = seuil de validation · > 4,0 = échec',
+    cancel:'Annuler',create:'Créer la matière',
+    scoreTitle:'Enregistrer un résultat',scoreType:"Type d'évaluation",
+    scoreVal:'Score obtenu (%)',scoreComment:'Commentaire',scoreCommentPh:'Notes sur cette évaluation…',
+    save:'Enregistrer',
+    modes:['Étude','Pratique','Révision','Simulation examen'],
+    modeKeys:['study','practice','review','exam'],
+    scoreTypes:['Quiz / contrôle','Exercices','Examen blanc','Auto-évaluation'],
+    scoreTypeKeys:['quiz','exercise','mock_exam','self_eval'],
+    cats:['Sciences','Droit','Économie','Lettres','Informatique','Médecine','Ingénierie','Autre'],
+    diffs:['Facile','Modérée','Difficile','Très difficile'],
+    progress:'Progression',time:'temps',avgScore:'score moy.',chance:'chance',
+    info:'Informations',category:'Catégorie',difficulty:'Difficulté',targetH:'Heures cible',
+    passGrade:'Seuil de validation',exam:'Examen',predTitle:'Prédiction actuelle',
+    predGrade:'Note prédite',predChance:'Chance de réussite',predVerdict:'Verdict',predConf:'Confiance modèle',
+    progressLabel:'Progression globale',results:'Résultats',sessions:'Sessions',
+    delete:'Supprimer',addResult:'+ Résultat',startSess:'Démarrer session',
+    willPass:'✓ Validation probable',willFail:"✗ Risque d'échec",
+    verdictOk:'✓ Probable',verdictKo:'✗ Risqué',
+    confHigh:'haute',confMed:'moyenne',confLow:'faible',confLowHint:' — ajoutez des sessions pour affiner',
+    addResultBtn:'+ Ajouter un résultat',timeCov:'Couverture temporelle',
+    scoreFac:'Score moyen',consist:'Régularité',confidence:'Confiance',
+    daysLeft:'j avant examen',deletedSub:'Matière supprimée',
+    deleteConfirm:'Supprimer cette matière et toutes ses données ?',
+    sessionRunning:'Une session est déjà en cours',chooseSubject:'Choisissez une matière',
+    toastAdded:'ajoutée ✓',toastStarted:'Session démarrée — bonne étude ! 🚀',
+    toastSaved:'Session enregistrée ✓',toastScore:'Résultat enregistré ✓',
+    toastDeleted:'Matière supprimée',toastEnterName:'Entrez un nom de matière',
+    objective:'Objectif',remaining:'Restant',stop:'Terminer',stopScore:'Terminer + score',
+    gradeLabel:['Très bien','Très bien','Bien','Bien','Bien','Assez bien','Assez bien','Suffisant','Suffisant','Suffisant'],
+    predictedGrade:'Note prédite',hours:'Heures',chooseSubPh:'-- Choisir une matière --',
+    passThreshold:'≤ 4,0 pour valider',
+  },
+  en: {
+    btnAddSubject:'+ Subject',
+    tabs:['Dashboard','Subjects','Analytics','Predictions'],
+    stats:['Subjects tracked','Total time','Avg. score','Today'],
+    activeSession:'Active session',noSession:'No session in progress',
+    selectHint:'Select a subject to start',startSession:'Start a session',
+    modeLabel:'Mode',goalLabel:'Goal (min)',btnStart:'Start session',
+    recent:'Recent sessions',noSessions:'No sessions recorded',noSubjects:'No subjects',
+    addHint:'Add your first subject to get started',btnAddFirst:'+ Add a subject',
+    chartTime:'Study time per subject',chartGrade:'Predicted grade per subject',
+    chartWeekly:'Weekly activity (last 7 days)',
+    noPred:'No predictions available',noPredHint:'Add subjects and sessions to see your predictions',
+    modalSubTitle:'New subject',subName:'Subject name *',subNamePh:'e.g. Mathematics, Civil Law…',
+    subCat:'Category',subDiff:'Perceived difficulty',subHours:'Target hours total',
+    subExam:'Exam date',subDesc:'Description / goals',subDescPh:'Topics covered, goals…',
+    gradeInfo:'⚖️ Scale: 1.0 = best · 4.0 = pass threshold · > 4.0 = fail',
+    cancel:'Cancel',create:'Create subject',
+    scoreTitle:'Log a result',scoreType:'Evaluation type',
+    scoreVal:'Score obtained (%)',scoreComment:'Comment',scoreCommentPh:'Notes about this evaluation…',
+    save:'Save',
+    modes:['Study','Practice','Review','Mock exam'],
+    modeKeys:['study','practice','review','exam'],
+    scoreTypes:['Quiz / test','Exercises','Mock exam','Self-assessment'],
+    scoreTypeKeys:['quiz','exercise','mock_exam','self_eval'],
+    cats:['Sciences','Law','Economics','Humanities','Computer Science','Medicine','Engineering','Other'],
+    diffs:['Easy','Moderate','Difficult','Very difficult'],
+    progress:'Progress',time:'time',avgScore:'avg. score',chance:'chance',
+    info:'Information',category:'Category',difficulty:'Difficulty',targetH:'Target hours',
+    passGrade:'Pass threshold',exam:'Exam',predTitle:'Current prediction',
+    predGrade:'Predicted grade',predChance:'Pass probability',predVerdict:'Verdict',predConf:'Model confidence',
+    progressLabel:'Overall progress',results:'Results',sessions:'Sessions',
+    delete:'Delete',addResult:'+ Result',startSess:'Start session',
+    willPass:'✓ Pass likely',willFail:'✗ Risk of failure',
+    verdictOk:'✓ Likely',verdictKo:'✗ Risky',
+    confHigh:'high',confMed:'medium',confLow:'low',confLowHint:' — add sessions to refine',
+    addResultBtn:'+ Add a result',timeCov:'Time coverage',
+    scoreFac:'Avg. score',consist:'Consistency',confidence:'Confidence',
+    daysLeft:'d until exam',deletedSub:'Subject deleted',
+    deleteConfirm:'Delete this subject and all its data?',
+    sessionRunning:'A session is already running',chooseSubject:'Choose a subject',
+    toastAdded:'added ✓',toastStarted:'Session started — good luck! 🚀',
+    toastSaved:'Session saved ✓',toastScore:'Result saved ✓',
+    toastDeleted:'Subject deleted',toastEnterName:'Enter a subject name',
+    objective:'Goal',remaining:'Remaining',stop:'Stop',stopScore:'Stop + score',
+    gradeLabel:['Excellent','Excellent','Good','Good','Good','Satisfactory','Satisfactory','Sufficient','Sufficient','Sufficient'],
+    predictedGrade:'Predicted grade',hours:'Hours',chooseSubPh:'-- Choose a subject --',
+    passThreshold:'≤ 4.0 to pass',
+  },
+  de: {
+    btnAddSubject:'+ Fach',
+    tabs:['Dashboard','Fächer','Analytik','Prognosen'],
+    stats:['Verfolgte Fächer','Gesamtzeit','Ø-Score','Heute'],
+    activeSession:'Aktive Sitzung',noSession:'Keine Sitzung aktiv',
+    selectHint:'Wählen Sie ein Fach aus',startSession:'Sitzung starten',
+    modeLabel:'Modus',goalLabel:'Ziel (Min.)',btnStart:'Sitzung starten',
+    recent:'Letzte Sitzungen',noSessions:'Keine Sitzungen gespeichert',noSubjects:'Keine Fächer',
+    addHint:'Fügen Sie Ihr erstes Fach hinzu',btnAddFirst:'+ Fach hinzufügen',
+    chartTime:'Lernzeit pro Fach',chartGrade:'Voraussichtliche Note pro Fach',
+    chartWeekly:'Wöchentliche Aktivität (letzte 7 Tage)',
+    noPred:'Keine Prognosen verfügbar',noPredHint:'Fügen Sie Fächer und Sitzungen hinzu',
+    modalSubTitle:'Neues Fach',subName:'Fachname *',subNamePh:'z.B. Mathematik, Bürgerliches Recht…',
+    subCat:'Kategorie',subDiff:'Schwierigkeitsgrad',subHours:'Gesamte Zielstunden',
+    subExam:'Prüfungsdatum',subDesc:'Beschreibung / Ziele',subDescPh:'Behandelte Themen, Ziele…',
+    gradeInfo:'⚖️ Notenskala: 1,0 = beste Note · 4,0 = Bestehensgrenze · > 4,0 = nicht bestanden',
+    cancel:'Abbrechen',create:'Fach erstellen',
+    scoreTitle:'Ergebnis erfassen',scoreType:'Bewertungsart',
+    scoreVal:'Erreichter Score (%)',scoreComment:'Kommentar',scoreCommentPh:'Notizen zu dieser Bewertung…',
+    save:'Speichern',
+    modes:['Lernen','Üben','Wiederholen','Prüfungssimulation'],
+    modeKeys:['study','practice','review','exam'],
+    scoreTypes:['Quiz / Test','Übungen','Probeprüfung','Selbstbewertung'],
+    scoreTypeKeys:['quiz','exercise','mock_exam','self_eval'],
+    cats:['Naturwissenschaften','Recht','Wirtschaft','Geisteswissenschaften','Informatik','Medizin','Ingenieurwesen','Sonstiges'],
+    diffs:['Leicht','Mittel','Schwer','Sehr schwer'],
+    progress:'Fortschritt',time:'Zeit',avgScore:'Ø-Score',chance:'Chance',
+    info:'Informationen',category:'Kategorie',difficulty:'Schwierigkeitsgrad',targetH:'Zielstunden',
+    passGrade:'Bestehensgrenze',exam:'Prüfung',predTitle:'Aktuelle Prognose',
+    predGrade:'Voraussichtliche Note',predChance:'Bestehenswahrscheinlichkeit',predVerdict:'Fazit',predConf:'Modellvertrauen',
+    progressLabel:'Gesamtfortschritt',results:'Ergebnisse',sessions:'Sitzungen',
+    delete:'Löschen',addResult:'+ Ergebnis',startSess:'Sitzung starten',
+    willPass:'✓ Bestehen wahrscheinlich',willFail:'✗ Nicht bestehen riskiert',
+    verdictOk:'✓ Wahrscheinlich',verdictKo:'✗ Riskant',
+    confHigh:'hoch',confMed:'mittel',confLow:'gering',confLowHint:' — fügen Sie Sitzungen hinzu',
+    addResultBtn:'+ Ergebnis hinzufügen',timeCov:'Zeitabdeckung',
+    scoreFac:'Ø-Score',consist:'Regelmäßigkeit',confidence:'Vertrauen',
+    daysLeft:'T. bis Prüfung',deletedSub:'Fach gelöscht',
+    deleteConfirm:'Dieses Fach und alle Daten löschen?',
+    sessionRunning:'Eine Sitzung läuft bereits',chooseSubject:'Wählen Sie ein Fach',
+    toastAdded:'hinzugefügt ✓',toastStarted:'Sitzung gestartet — viel Erfolg! 🚀',
+    toastSaved:'Sitzung gespeichert ✓',toastScore:'Ergebnis gespeichert ✓',
+    toastDeleted:'Fach gelöscht',toastEnterName:'Geben Sie einen Fachnamen ein',
+    objective:'Ziel',remaining:'Verbleibend',stop:'Beenden',stopScore:'Beenden + Score',
+    gradeLabel:['Sehr gut','Sehr gut','Gut','Gut','Gut','Befriedigend','Befriedigend','Ausreichend','Ausreichend','Ausreichend'],
+    predictedGrade:'Voraussichtliche Note',hours:'Stunden',chooseSubPh:'-- Fach wählen --',
+    passThreshold:'≤ 4,0 zum Bestehen',
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// GRADE SYSTEM
+// ═══════════════════════════════════════════════════════
+const VALID_GRADES = [1.0,1.3,1.7,2.0,2.3,2.7,3.0,3.3,3.7,4.0,4.3,4.7,5.0];
+const PASS_GRADES  = [1.0,1.3,1.7,2.0,2.3,2.7,3.0,3.3,3.7,4.0];
+
+function snapGrade(raw) {
+  return VALID_GRADES.reduce((b,g)=>Math.abs(g-raw)<Math.abs(b-raw)?g:b);
+}
+function gradeColor(g) {
+  if(g<=1.7)return'emerald';if(g<=2.7)return'cyan';if(g<=3.7)return'amber';if(g<=4.0)return'orange';return'red';
+}
+function gradeLabel(g,lang) {
+  const idx=PASS_GRADES.indexOf(g);
+  if(idx===-1)return lang==='de'?'Nicht bestanden':lang==='en'?'Failed':'Échoué';
+  return T[lang].gradeLabel[idx]||'';
+}
+
+// ═══════════════════════════════════════════════════════
+// DATA LAYER
+// ═══════════════════════════════════════════════════════
+const DB = {
+  get subjects(){return JSON.parse(localStorage.getItem('st_subjects')||'[]')},
+  set subjects(v){localStorage.setItem('st_subjects',JSON.stringify(v))},
+  get sessions(){return JSON.parse(localStorage.getItem('st_sessions')||'[]')},
+  set sessions(v){localStorage.setItem('st_sessions',JSON.stringify(v))},
+  get scores(){return JSON.parse(localStorage.getItem('st_scores')||'[]')},
+  set scores(v){localStorage.setItem('st_scores',JSON.stringify(v))},
+  get lang(){return localStorage.getItem('st_lang')||'en'},
+  set lang(v){localStorage.setItem('st_lang',v)},
+};
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let activeSession=null,timerInterval=null,currentTab='dashboard',charts={},currentLang=DB.lang;
+
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
+const fmt=s=>{const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;return h?`${h}h ${m.toString().padStart(2,'0')}min`:`${m}min ${sc.toString().padStart(2,'0')}s`};
+const fmtH=s=>(s/3600).toFixed(1)+'h';
+const todayStr=()=>new Date().toISOString().split('T')[0];
+const t=key=>T[currentLang][key]||key;
+
+const toast=(msg,color='emerald')=>{
+  const el=document.getElementById('toast'),ti=document.getElementById('toast-inner');
+  ti.textContent=msg;ti.className=`glass px-5 py-3 rounded-xl text-sm font-medium text-${color}-400 border border-${color}-500/20 fade-in`;
+  el.classList.remove('hidden');clearTimeout(el._to);el._to=setTimeout(()=>el.classList.add('hidden'),2800);
+};
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+function initApp() {
+  const d=new Date();d.setDate(d.getDate()+90);
+  document.getElementById('sub-exam-date').value=d.toISOString().split('T')[0];
+  document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang));
+  applyTranslations();
+  setTab('dashboard');
+  renderHeroStats();
+  ['modal-subject','modal-detail','modal-score'].forEach(id=>{
+    document.getElementById(id).addEventListener('click',e=>{if(e.target===document.getElementById(id))closeModal(id);});
+  });
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  if(!checkLicense()){
+    // License screen already visible
+  } else {
+    initApp();
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// LANGUAGE
+// ═══════════════════════════════════════════════════════
+function setLang(lang){
+  currentLang=lang;DB.lang=lang;
+  document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
+  applyTranslations();setTab(currentTab);
+}
+function setText(id,key){const el=document.getElementById(id);if(el)el.textContent=t(key);}
+function setAttr(id,attr,val){const el=document.getElementById(id);if(el)el.setAttribute(attr,val);}
+
+function applyTranslations(){
+  const lang=currentLang;
+  document.title='Study Grade Predictor — App';
+  document.getElementById('btn-add-subject').textContent=t('btnAddSubject');
+  ['dashboard','subjects','analytics','predictions'].forEach((tab,i)=>{
+    const b=document.querySelector(`[data-tab="${tab}"]`);if(b)b.textContent=T[lang].tabs[i];
+  });
+  document.getElementById('nav-date').textContent=new Date().toLocaleDateString(
+    lang==='de'?'de-DE':lang==='en'?'en-US':'fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}
+  );
+  ['lbl-active-session','activeSession','lbl-no-session','noSession','lbl-select-hint','selectHint',
+   'lbl-start-session','startSession','lbl-mode','modeLabel','lbl-goal','goalLabel',
+   'btn-start-session','btnStart','lbl-recent','recent','lbl-no-subjects','noSubjects',
+   'lbl-add-hint','addHint','btn-add-first','btnAddFirst','lbl-chart-time','chartTime',
+   'lbl-chart-grade','chartGrade','lbl-chart-weekly','chartWeekly','lbl-no-pred','noPred',
+   'lbl-no-pred-hint','noPredHint','modal-sub-title','modalSubTitle','lbl-sub-name','subName',
+   'lbl-sub-cat','subCat','lbl-sub-diff','subDiff','lbl-sub-hours','subHours','lbl-sub-exam','subExam',
+   'lbl-grade-info','gradeInfo','lbl-sub-desc','subDesc','btn-cancel-sub','cancel','btn-save-sub','create',
+   'modal-score-title','scoreTitle','lbl-score-type','scoreType','lbl-score-val','scoreVal',
+   'lbl-score-comment','scoreComment','btn-cancel-score','cancel','btn-save-score','save'
+  ].reduce((acc,v,i,arr)=>i%2===0?[...acc,[v,arr[i+1]]]:acc,[]).forEach(([id,key])=>setText(id,key));
+
+  setAttr('sub-name','placeholder',t('subNamePh'));
+  setAttr('sub-desc','placeholder',t('subDescPh'));
+  setAttr('score-comment','placeholder',t('scoreCommentPh'));
+
+  populateSessionSubjectSelect();
+  const modeEl=document.getElementById('session-mode'),curMode=modeEl.value;
+  modeEl.innerHTML=t('modeKeys').map((k,i)=>`<option value="${k}" ${k===curMode?'selected':''}>${t('modes')[i]}</option>`).join('');
+  const stEl=document.getElementById('score-type'),curSt=stEl.value;
+  stEl.innerHTML=t('scoreTypeKeys').map((k,i)=>`<option value="${k}" ${k===curSt?'selected':''}>${t('scoreTypes')[i]}</option>`).join('');
+  const catEl=document.getElementById('sub-category'),curCat=catEl.value;
+  catEl.innerHTML=t('cats').map(c=>`<option ${c===curCat?'selected':''}>${c}</option>`).join('');
+  const diffEl=document.getElementById('sub-difficulty'),curDiff=diffEl.value;
+  diffEl.innerHTML=t('diffs').map((d,i)=>`<option value="${i+1}" ${(i+1)===parseInt(curDiff)?'selected':''}>${d}</option>`).join('');
+  if(!curDiff)diffEl.value='2';
+}
+
+// ═══════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════
+function setTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('tab-active'));
+  document.getElementById(`tab-${tab}`)?.classList.remove('hidden');
+  document.querySelector(`[data-tab="${tab}"]`)?.classList.add('tab-active');
+  if(tab==='dashboard')renderDashboard();
+  if(tab==='subjects')renderSubjects();
+  if(tab==='analytics')renderAnalytics();
+  if(tab==='predictions')renderPredictions();
+}
+
+// ═══════════════════════════════════════════════════════
+// HERO STATS
+// ═══════════════════════════════════════════════════════
+function renderHeroStats(){
+  const sessions=DB.sessions,scores=DB.scores,labels=T[currentLang].stats;
+  const totalSec=sessions.reduce((a,s)=>a+(s.duration||0),0);
+  const avgScore=scores.length?Math.round(scores.reduce((a,s)=>a+s.value,0)/scores.length):0;
+  const todaySec=sessions.filter(s=>s.date===todayStr()).reduce((a,s)=>a+(s.duration||0),0);
+  const stats=[
+    {label:labels[0],value:DB.subjects.length,color:'violet',icon:'📚',border:'border-violet'},
+    {label:labels[1],value:fmtH(totalSec),color:'cyan',icon:'⏱️',border:'border-cyan'},
+    {label:labels[2],value:avgScore+'%',color:'emerald',icon:'🎯',border:'border-emerald'},
+    {label:labels[3],value:fmtH(todaySec),color:'amber',icon:'🔥',border:'border-amber'},
+  ];
+  document.getElementById('hero-stats').innerHTML=stats.map(s=>`
+    <div class="glass stat-card ${s.border} rounded-xl p-3 sm:p-4 glass-hover cursor-default">
+      <div class="flex items-start justify-between">
+        <div><div class="text-xs text-slate-500 font-medium uppercase tracking-wider">${s.label}</div>
+        <div class="text-xl sm:text-2xl font-bold mt-1 text-${s.color}-400">${s.value}</div></div>
+        <span class="text-xl sm:text-2xl">${s.icon}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════
+function renderDashboard(){
+  renderHeroStats();applyTranslations();
+  populateSessionSubjectSelect();renderRecentSessions();
+  if(activeSession)renderActiveSessionPanel();
+}
+function populateSessionSubjectSelect(){
+  const sel=document.getElementById('session-subject'),cur=sel.value;
+  sel.innerHTML=`<option value="">${t('chooseSubPh')}</option>`+
+    DB.subjects.map(s=>`<option value="${s.id}" ${s.id===cur?'selected':''}>${s.name}</option>`).join('');
+}
+function renderRecentSessions(){
+  const sessions=DB.sessions.slice().reverse().slice(0,8),subjects=DB.subjects;
+  const el=document.getElementById('recent-sessions');
+  if(!sessions.length){el.innerHTML=`<div class="text-slate-600 text-sm text-center py-4">${t('noSessions')}</div>`;return;}
+  const modeMap={};t('modeKeys').forEach((k,i)=>modeMap[k]=t('modes')[i]);
+  el.innerHTML=sessions.map(s=>{
+    const sub=subjects.find(x=>x.id===s.subjectId);
+    return `<div class="glass glass-hover rounded-xl px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg gradient-btn flex items-center justify-center text-xs font-bold text-white shrink-0">${sub?sub.name[0].toUpperCase():'?'}</div>
+        <div><div class="text-sm font-medium text-slate-200">${sub?sub.name:t('deletedSub')}</div>
+        <div class="text-xs text-slate-500">${modeMap[s.mode]||s.mode} · ${s.date}</div></div>
+      </div>
+      <div class="text-right shrink-0 ml-2"><div class="text-sm font-semibold text-violet-400">${fmt(s.duration||0)}</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// SESSION TIMER
+// ═══════════════════════════════════════════════════════
+function startSession(){
+  if(activeSession){toast(t('sessionRunning'),'amber');return;}
+  const subId=document.getElementById('session-subject').value;
+  const mode=document.getElementById('session-mode').value;
+  const goal=parseInt(document.getElementById('session-goal').value)||60;
+  if(!subId){toast(t('chooseSubject'),'amber');return;}
+  const sub=DB.subjects.find(s=>s.id===subId);
+  activeSession={id:uid(),subjectId:subId,subjectName:sub.name,mode,goal:goal*60,start:Date.now(),elapsed:0,date:todayStr()};
+  timerInterval=setInterval(tickSession,1000);
+  renderActiveSessionPanel();toast(t('toastStarted'));
+}
+function tickSession(){
+  if(!activeSession)return;
+  activeSession.elapsed=Math.floor((Date.now()-activeSession.start)/1000);
+  renderActiveSessionPanel();
+}
+function stopSession(withScore){
+  if(!activeSession)return;
+  clearInterval(timerInterval);timerInterval=null;
+  const session={...activeSession,duration:activeSession.elapsed};
+  const sessions=DB.sessions;sessions.push(session);DB.sessions=sessions;
+  const sid=activeSession.subjectId;activeSession=null;
+  document.getElementById('active-session-panel').innerHTML=
+    `<div class="text-slate-500 text-sm">${t('noSession')}</div><div class="text-slate-600 text-xs mt-1">${t('selectHint')}</div>`;
+  renderHeroStats();renderRecentSessions();
+  if(currentTab==='subjects')renderSubjects();
+  if(currentTab==='predictions')renderPredictions();
+  if(currentTab==='analytics')renderAnalytics();
+  toast(t('toastSaved'),'emerald');
+  if(withScore)openScoreModal(sid);
+}
+function renderActiveSessionPanel(){
+  if(!activeSession)return;
+  const el=document.getElementById('active-session-panel');
+  const pct=Math.min(100,Math.round((activeSession.elapsed/activeSession.goal)*100));
+  const remaining=Math.max(0,activeSession.goal-activeSession.elapsed);
+  const modeMap={};t('modeKeys').forEach((k,i)=>modeMap[k]=t('modes')[i]);
+  el.innerHTML=`<div class="w-full">
+    <div class="flex items-center gap-2 mb-3 flex-wrap">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot inline-block"></span>
+      <span class="font-semibold text-slate-200">${activeSession.subjectName}</span>
+      <span class="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full">${modeMap[activeSession.mode]||activeSession.mode}</span>
+    </div>
+    <div class="text-3xl sm:text-4xl font-bold text-violet-400 mb-2 font-mono">${fmt(activeSession.elapsed)}</div>
+    <div class="text-xs text-slate-500 mb-3">${t('objective')}: ${fmt(activeSession.goal)} · ${t('remaining')}: ${fmt(remaining)}</div>
+    <div class="w-full bg-slate-800 rounded-full h-2 mb-4"><div class="progress-bar h-2 rounded-full" style="width:${pct}%"></div></div>
+    <div class="flex gap-2">
+      <button onclick="stopSession(false)" class="flex-1 py-2 rounded-lg border border-slate-700 text-slate-400 text-sm hover:border-red-500/50 hover:text-red-400 transition">${t('stop')}</button>
+      <button onclick="stopSession(true)" class="flex-1 gradient-btn py-2 rounded-lg text-white text-sm font-medium">${t('stopScore')}</button>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// PROGRESS (composite: 60% time + 40% score)
+// ═══════════════════════════════════════════════════════
+function computeProgress(sub){
+  const sessions=DB.sessions.filter(s=>s.subjectId===sub.id);
+  const scores=DB.scores.filter(s=>s.subjectId===sub.id);
+  const totalSec=sessions.reduce((a,s)=>a+(s.duration||0),0);
+  const timePct=Math.min(1,totalSec/3600/(sub.targetHours||80));
+  const scorePct=scores.length?scores.reduce((a,s)=>a+s.value,0)/scores.length/100:0;
+  const composite=scores.length?timePct*0.6+scorePct*0.4:timePct;
+  return{pct:Math.round(composite*100),totalSec};
+}
+
+// ═══════════════════════════════════════════════════════
+// SUBJECTS
+// ═══════════════════════════════════════════════════════
+function renderSubjects(){
+  const subjects=DB.subjects,grid=document.getElementById('subjects-grid'),empty=document.getElementById('subjects-empty');
+  if(!subjects.length){grid.innerHTML='';empty.classList.remove('hidden');return;}
+  empty.classList.add('hidden');
+  grid.innerHTML=subjects.map(sub=>{
+    const{pct,totalSec}=computeProgress(sub);
+    const scores=DB.scores.filter(s=>s.subjectId===sub.id);
+    const avgScore=scores.length?Math.round(scores.reduce((a,s)=>a+s.value,0)/scores.length):null;
+    const daysLeft=sub.examDate?Math.ceil((new Date(sub.examDate)-new Date())/86400000):null;
+    const pred=predict(sub),gc=gradeColor(pred.grade);
+    return`<div class="glass glass-hover rounded-xl p-4 flex flex-col gap-3 cursor-pointer" onclick="openDetail('${sub.id}')">
+      <div class="flex items-start justify-between">
+        <div><div class="font-semibold text-slate-200">${sub.name}</div>
+        <div class="text-xs text-slate-500 mt-0.5">${sub.category} · ${t('diffs')[sub.difficulty-1]||''}</div></div>
+        ${daysLeft!==null?`<span class="text-xs px-2 py-0.5 rounded-full shrink-0 ml-2 ${daysLeft<7?'bg-red-500/20 text-red-400':daysLeft<30?'bg-amber-500/20 text-amber-400':'bg-slate-700 text-slate-400'}">${daysLeft}${t('daysLeft')}</span>`:''}
+      </div>
+      <div>
+        <div class="flex justify-between text-xs text-slate-500 mb-1"><span>${t('progress')}</span><span class="text-violet-400 font-medium">${pct}%</span></div>
+        <div class="w-full bg-slate-800 rounded-full h-1.5"><div class="progress-bar h-1.5 rounded-full" style="width:${pct}%"></div></div>
+      </div>
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div class="bg-slate-800/60 rounded-lg py-2"><div class="text-sm font-bold text-cyan-400">${fmtH(totalSec)}</div><div class="text-xs text-slate-600">${t('time')}</div></div>
+        <div class="bg-slate-800/60 rounded-lg py-2"><div class="text-sm font-bold text-violet-400">${avgScore!=null?avgScore+'%':'—'}</div><div class="text-xs text-slate-600">${t('avgScore')}</div></div>
+        <div class="bg-slate-800/60 rounded-lg py-2"><div class="text-sm font-bold text-${gc}-400">${pred.grade.toFixed(1)}</div><div class="text-xs text-slate-600">${t('predictedGrade')}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// PREDICTION ENGINE
+// ═══════════════════════════════════════════════════════
+function predict(sub){
+  const sessions=DB.sessions.filter(s=>s.subjectId===sub.id);
+  const scores=DB.scores.filter(s=>s.subjectId===sub.id);
+  const totalSec=sessions.reduce((a,s)=>a+(s.duration||0),0);
+  const timeFactor=Math.min(1,totalSec/3600/(sub.targetHours||80));
+  const avgScore=scores.length?scores.reduce((a,s)=>a+s.value,0)/scores.length/100:0.5;
+  let trend=0;
+  if(scores.length>=2){
+    const rec=scores.slice(-3).reduce((a,s)=>a+s.value,0)/Math.min(3,scores.length);
+    const old=scores.slice(0,-3).reduce((a,s)=>a+s.value,0)/Math.max(1,scores.length-3);
+    trend=(rec-old)/100;
+  }
+  const firstDate=sessions.length?Math.min(...sessions.map(s=>new Date(s.date).getTime())):Date.now();
+  const weeksElapsed=Math.max(1,(Date.now()-firstDate)/(7*24*3600*1000));
+  const consistFactor=Math.min(1,(sessions.length/weeksElapsed)/5);
+  const diffPenalty=[0,0,0.05,0.12,0.22][sub.difficulty||2];
+  let timePressure=0;
+  if(sub.examDate){
+    const dLeft=Math.ceil((new Date(sub.examDate)-new Date())/86400000);
+    const totDays=Math.max(1,Math.ceil((new Date(sub.examDate)-new Date(sub.createdAt||0))/86400000));
+    timePressure=Math.max(0,1-timeFactor)*Math.max(0,1-(dLeft/totDays));
+  }
+  const perf=Math.max(0,Math.min(1,timeFactor*0.35+avgScore*0.40+consistFactor*0.15+trend*0.10-diffPenalty-timePressure*0.1));
+  const grade=snapGrade(1.0+(1-perf)*4.0);
+  const passProb=Math.round(sigmoid(perf,0.5,8)*100);
+  const willPass=grade<=4.0&&passProb>=50;
+  const confLow=t('confLow');
+  const confidence=scores.length>=3&&sessions.length>=5?t('confHigh'):scores.length>=1||sessions.length>=2?t('confMed'):confLow;
+  return{passProb,grade,willPass,confidence,confLow,timeFactor,avgScore:Math.round(avgScore*100),consistFactor};
+}
+function sigmoid(x,mid,k){return 1/(1+Math.exp(-k*(x-mid)));}
+
+// ═══════════════════════════════════════════════════════
+// PREDICTIONS
+// ═══════════════════════════════════════════════════════
+function renderPredictions(){
+  const subjects=DB.subjects,grid=document.getElementById('predictions-grid'),empty=document.getElementById('predictions-empty');
+  if(!subjects.length){grid.innerHTML='';empty.classList.remove('hidden');return;}
+  empty.classList.add('hidden');
+  grid.innerHTML=subjects.map(sub=>{
+    const pred=predict(sub),gc=gradeColor(pred.grade);
+    const probColor=pred.passProb>=70?'emerald':pred.passProb>=50?'amber':'red';
+    const circleColor=pred.willPass?'#10b981':'#ef4444';
+    const daysLeft=sub.examDate?Math.ceil((new Date(sub.examDate)-new Date())/86400000):null;
+    const gLabel=gradeLabel(pred.grade,currentLang);
+    const barFill=Math.max(0,Math.round((5.0-pred.grade)/4.0*100));
+    return`<div class="glass rounded-xl p-4 sm:p-5 flex flex-col gap-4">
+      <div><div class="font-semibold text-slate-200">${sub.name}</div>
+      <div class="text-xs text-slate-500">${sub.category} · ${t('passThreshold')}${daysLeft!==null?' · '+daysLeft+' '+t('daysLeft'):''}</div></div>
+      <div class="flex items-center justify-center">
+        <div class="relative w-24 h-24 sm:w-28 sm:h-28">
+          <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="${circleColor}" stroke-width="10"
+              stroke-dasharray="${pred.passProb*2.513} 251.3" stroke-linecap="round" style="transition:stroke-dasharray .8s ease"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <div class="text-lg sm:text-xl font-bold text-${probColor}-400">${pred.passProb}%</div>
+            <div class="text-xs text-slate-500">${t('chance')}</div>
+          </div>
+        </div>
+      </div>
+      <div class="text-center"><div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${pred.willPass?'bg-emerald-500/15 text-emerald-400':'bg-red-500/15 text-red-400'}">${pred.willPass?t('willPass'):t('willFail')}</div></div>
+      <div class="glass rounded-xl p-3 text-center">
+        <div class="text-xs text-slate-500 mb-1">${t('predGrade')}</div>
+        <div class="text-3xl font-bold text-${gc}-400">${pred.grade.toFixed(1)}</div>
+        <div class="text-xs text-slate-400 mt-0.5">${gLabel}</div>
+        <div class="w-full bg-slate-800 rounded-full h-1.5 mt-2"><div class="h-1.5 rounded-full bg-${gc}-500 transition-all" style="width:${barFill}%"></div></div>
+        <div class="flex justify-between text-xs text-slate-600 mt-1"><span>1,0 ★</span><span>4,0</span></div>
+      </div>
+      <div class="space-y-2">
+        ${renderFactor(t('timeCov'),Math.round(pred.timeFactor*100))}
+        ${renderFactor(t('scoreFac'),pred.avgScore)}
+        ${renderFactor(t('consist'),Math.round(pred.consistFactor*100))}
+      </div>
+      <div class="text-xs text-center text-slate-600">${t('confidence')}: <span class="text-slate-400">${pred.confidence}</span>${pred.confidence===pred.confLow?t('confLowHint'):''}</div>
+      <button onclick="openScoreModal('${sub.id}')" class="gradient-btn py-2 rounded-lg text-white text-xs font-medium">${t('addResultBtn')}</button>
+    </div>`;
+  }).join('');
+}
+function renderFactor(label,pct){
+  const c=pct>=70?'emerald':pct>=50?'cyan':pct>=30?'amber':'red';
+  return`<div><div class="flex justify-between text-xs mb-0.5"><span class="text-slate-500">${label}</span><span class="text-${c}-400">${pct}%</span></div><div class="w-full bg-slate-800 rounded-full h-1"><div class="h-1 rounded-full bg-${c}-500" style="width:${pct}%"></div></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// ANALYTICS
+// ═══════════════════════════════════════════════════════
+function renderAnalytics(){
+  const subjects=DB.subjects,sessions=DB.sessions;
+  Object.values(charts).forEach(c=>c.destroy());charts={};
+  const timeData=subjects.map(s=>sessions.filter(x=>x.subjectId===s.id).reduce((a,x)=>a+(x.duration||0),0)/3600);
+  const ctx1=document.getElementById('chart-time').getContext('2d');
+  charts.time=new Chart(ctx1,{type:'doughnut',data:{labels:subjects.map(s=>s.name),datasets:[{data:timeData,backgroundColor:['#7c3aed','#0891b2','#059669','#d97706','#dc2626','#be185d','#6366f1','#0e7490','#15803d','#b45309','#9f1239','#7e22ce'],borderWidth:0,hoverOffset:6}]},options:{plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},cutout:'65%'}});
+  const ctx2=document.getElementById('chart-progress').getContext('2d');
+  const gradeData=subjects.map(s=>predict(s).grade);
+  const barColors=gradeData.map(g=>{const c=gradeColor(g);return c==='emerald'?'rgba(16,185,129,.7)':c==='cyan'?'rgba(6,182,212,.7)':c==='amber'?'rgba(245,158,11,.7)':c==='orange'?'rgba(249,115,22,.7)':'rgba(239,68,68,.7)';});
+  charts.progress=new Chart(ctx2,{type:'bar',data:{labels:subjects.map(s=>s.name.length>12?s.name.slice(0,12)+'…':s.name),datasets:[{label:t('predictedGrade'),data:gradeData,backgroundColor:barColors,borderRadius:6,borderSkipped:false}]},options:{scales:{x:{ticks:{color:'#64748b'},grid:{color:'rgba(255,255,255,.04)'}},y:{min:1,max:5,ticks:{color:'#64748b',callback:v=>v.toFixed(1)},grid:{color:'rgba(255,255,255,.04)'},title:{display:true,text:'1.0 = beste Note',color:'#475569',font:{size:10}}}},plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}}}});
+  const ctx3=document.getElementById('chart-weekly').getContext('2d');
+  const days7=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d.toISOString().split('T')[0];});
+  const weekData=days7.map(d=>sessions.filter(s=>s.date===d).reduce((a,s)=>a+(s.duration||0),0)/3600);
+  const loc=currentLang==='de'?'de-DE':currentLang==='en'?'en-US':'fr-FR';
+  const weekLabels=days7.map(d=>new Date(d).toLocaleDateString(loc,{weekday:'short'}));
+  charts.weekly=new Chart(ctx3,{type:'bar',data:{labels:weekLabels,datasets:[{label:t('hours'),data:weekData,backgroundColor:'rgba(6,182,212,.6)',borderRadius:4,borderSkipped:false}]},options:{scales:{x:{ticks:{color:'#64748b'},grid:{display:false}},y:{ticks:{color:'#64748b'},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true}},plugins:{legend:{display:false}}}});
+}
+
+// ═══════════════════════════════════════════════════════
+// SUBJECT DETAIL
+// ═══════════════════════════════════════════════════════
+function openDetail(id){
+  const sub=DB.subjects.find(s=>s.id===id);if(!sub)return;
+  document.getElementById('detail-title').textContent=sub.name;
+  const sessions=DB.sessions.filter(s=>s.subjectId===id);
+  const scores=DB.scores.filter(s=>s.subjectId===id);
+  const pred=predict(sub),{pct,totalSec}=computeProgress(sub);
+  const modeMap={};t('modeKeys').forEach((k,i)=>modeMap[k]=t('modes')[i]);
+  const stMap={};t('scoreTypeKeys').forEach((k,i)=>stMap[k]=t('scoreTypes')[i]);
+  const gc=gradeColor(pred.grade),gLabel=gradeLabel(pred.grade,currentLang);
+  const loc=currentLang==='de'?'de-DE':currentLang==='en'?'en-US':'fr-FR';
+  document.getElementById('detail-content').innerHTML=`
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+      <div class="glass rounded-xl p-4 space-y-2">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">${t('info')}</div>
+        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('category')}</span><span>${sub.category}</span></div>
+        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('difficulty')}</span><span>${t('diffs')[sub.difficulty-1]||''}</span></div>
+        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('targetH')}</span><span>${sub.targetHours}h</span></div>
+        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('passGrade')}</span><span>≤ 4,0</span></div>
+        ${sub.examDate?`<div class="flex justify-between text-sm"><span class="text-slate-500">${t('exam')}</span><span>${new Date(sub.examDate).toLocaleDateString(loc)}</span></div>`:''}
+        ${sub.desc?`<div class="text-xs text-slate-500 mt-1 pt-2 border-t border-white/5">${sub.desc}</div>`:''}
+      </div>
+      <div class="glass rounded-xl p-4 space-y-2">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">${t('predTitle')}</div>
+        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('predGrade')}</span><span class="font-bold text-${gc}-400">${pred.grade.toFixed(1)} — ${gLabel}</span></div>
+        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('predChance')}</span><span class="font-bold ${pred.passProb>=70?'text-emerald-400':pred.passProb>=50?'text-amber-400':'text-red-400'}">${pred.passProb}%</span></div>
+        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('predVerdict')}</span><span class="${pred.willPass?'text-emerald-400':'text-red-400'}">${pred.willPass?t('verdictOk'):t('verdictKo')}</span></div>
+        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('predConf')}</span><span>${pred.confidence}</span></div>
+      </div>
+    </div>
+    <div class="glass rounded-xl p-4 mb-4">
+      <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">${t('progressLabel')}</div>
+      <div class="flex justify-between text-xs text-slate-500 mb-1"><span>${fmtH(totalSec)} / ${sub.targetHours}h</span><span class="text-violet-400">${pct}%</span></div>
+      <div class="w-full bg-slate-800 rounded-full h-2"><div class="progress-bar h-2 rounded-full" style="width:${pct}%"></div></div>
+      <div class="text-xs text-slate-600 mt-1">${currentLang==='de'?'Kombiniert: Zeit (60%) + Score (40%)':currentLang==='en'?'Combined: Time (60%) + Score (40%)':'Combiné : Temps (60%) + Score (40%)'}</div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+      <div class="glass rounded-xl p-4">
+        <div class="flex items-center justify-between mb-2">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">${t('results')} (${scores.length})</div>
+          <button onclick="openScoreModal('${id}')" class="text-xs text-violet-400 hover:text-violet-300">+ ${t('addResult')}</button>
+        </div>
+        ${scores.length?scores.slice().reverse().slice(0,5).map(sc=>`
+          <div class="flex justify-between items-center py-1.5 border-b border-white/5 text-sm">
+            <span class="text-slate-400 truncate mr-2">${stMap[sc.type]||sc.type}${sc.comment?` — ${sc.comment.slice(0,20)}`:''}</span>
+            <span class="font-semibold shrink-0 ${sc.value>=70?'text-emerald-400':sc.value>=50?'text-amber-400':'text-red-400'}">${sc.value}%</span>
+          </div>`).join(''):`<div class="text-slate-600 text-sm">${t('noSessions')}</div>`}
+      </div>
+      <div class="glass rounded-xl p-4">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">${t('sessions')} (${sessions.length})</div>
+        ${sessions.length?sessions.slice().reverse().slice(0,5).map(s=>`
+          <div class="flex justify-between items-center py-1.5 border-b border-white/5 text-sm">
+            <span class="text-slate-400">${modeMap[s.mode]||s.mode}</span>
+            <span class="text-cyan-400">${fmt(s.duration||0)}</span>
+          </div>`).join(''):`<div class="text-slate-600 text-sm">${t('noSessions')}</div>`}
+      </div>
+    </div>
+    <div class="flex gap-3 flex-wrap">
+      <button onclick="deleteSubject('${id}')" class="px-4 py-2 rounded-lg border border-red-500/30 text-red-400 text-sm hover:bg-red-500/10 transition">${t('delete')}</button>
+      <button onclick="closeModal('modal-detail');openScoreModal('${id}')" class="flex-1 gradient-btn py-2 rounded-lg text-white text-sm font-medium">${t('addResult')}</button>
+      <button onclick="closeModal('modal-detail');document.getElementById('session-subject').value='${id}';setTab('dashboard')" class="flex-1 py-2 rounded-lg border border-violet-500/30 text-violet-400 text-sm hover:bg-violet-500/10 transition">${t('startSess')}</button>
+    </div>`;
+  document.getElementById('modal-detail').classList.remove('hidden');
+}
+
+function deleteSubject(id){
+  if(!confirm(t('deleteConfirm')))return;
+  DB.subjects=DB.subjects.filter(s=>s.id!==id);
+  DB.sessions=DB.sessions.filter(s=>s.subjectId!==id);
+  DB.scores=DB.scores.filter(s=>s.subjectId!==id);
+  closeModal('modal-detail');setTab('subjects');renderHeroStats();
+  toast(t('toastDeleted'),'red');
+}
+
+// ═══════════════════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════════════════
+function openAddSubject(){document.getElementById('modal-subject').classList.remove('hidden');}
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+
+function saveSubject(){
+  const name=document.getElementById('sub-name').value.trim();
+  if(!name){toast(t('toastEnterName'),'amber');return;}
+  const sub={id:uid(),name,category:document.getElementById('sub-category').value,
+    difficulty:parseInt(document.getElementById('sub-difficulty').value),
+    targetHours:parseFloat(document.getElementById('sub-target-hours').value)||80,
+    examDate:document.getElementById('sub-exam-date').value,
+    desc:document.getElementById('sub-desc').value.trim(),createdAt:new Date().toISOString()};
+  DB.subjects=[...DB.subjects,sub];
+  closeModal('modal-subject');
+  document.getElementById('sub-name').value='';document.getElementById('sub-desc').value='';
+  renderHeroStats();populateSessionSubjectSelect();setTab('subjects');
+  toast(`"${sub.name}" ${t('toastAdded')}`);
+}
+
+function openScoreModal(subjectId){
+  document.getElementById('score-subject-id').value=subjectId;
+  document.getElementById('score-value').value=70;
+  document.getElementById('score-display').textContent='70%';
+  document.getElementById('score-comment').value='';
+  document.getElementById('modal-score').classList.remove('hidden');
+}
+
+function saveScore(){
+  const subjectId=document.getElementById('score-subject-id').value;
+  const value=parseInt(document.getElementById('score-value').value);
+  const type=document.getElementById('score-type').value;
+  const comment=document.getElementById('score-comment').value.trim();
+  DB.scores=[...DB.scores,{id:uid(),subjectId,value,type,comment,date:todayStr(),createdAt:new Date().toISOString()}];
+  closeModal('modal-score');renderHeroStats();
+  if(currentTab==='predictions')renderPredictions();
+  if(currentTab==='subjects')renderSubjects();
+  if(currentTab==='dashboard')renderRecentSessions();
+  if(currentTab==='analytics')renderAnalytics();
+  toast(t('toastScore'));
+}
+</script>
+</body>
+</html>
