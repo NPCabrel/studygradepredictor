@@ -408,8 +408,6 @@ nav{background:rgba(10,10,15,.85);backdrop-filter:blur(20px);border-bottom:1px s
 <!-- ═══════════════════════════════════════════════════════ SCRIPTS -->
 <script>
 // ─────────────────── CONSTANTS ───────────────────
-const TRIAL_DAYS = 7;
-const GUMROAD_URL = 'https://nague.gumroad.com/l/nagDev';
 const VALID_GRADES = [1.0,1.3,1.7,2.0,2.3,2.7,3.0,3.3,3.7,4.0];
 const PASS_GRADES  = [1.0,1.3,1.7,2.0,2.3,2.7,3.0,3.3];
 
@@ -1048,63 +1046,6 @@ function gradeLabel(g){
   return lbs[5];
 }
 
-// ─────────────────── ACCESS CONTROL ───────────────────
-function validateKey(raw){
-  const key=(raw||'').trim().toUpperCase();
-  return /^[0-9A-F]{8}-[0-9A-F]{8}-[0-9A-F]{8}-[0-9A-F]{8}$/.test(key);
-}
-function getAccessState(){
-  if(validateKey(localStorage.getItem('sgp_license')||'')) return 'licensed';
-  const ts=localStorage.getItem('sgp_trial_start');
-  if(ts) return Date.now()-parseInt(ts)<TRIAL_DAYS*86400000?'trial':'trial_expired';
-  return 'none';
-}
-function startTrial(){
-  localStorage.setItem('sgp_trial_start', Date.now().toString());
-  hideLicenseScreen();
-  openRoleScreen();
-}
-function activateLicense(){
-  const raw=document.getElementById('license-input').value;
-  if(!validateKey(raw)){ toast('Invalid license key','red'); return; }
-  localStorage.setItem('sgp_license', raw.trim().toUpperCase());
-  hideLicenseScreen();
-  currentRole=localStorage.getItem('sgp_role');
-  if(!currentRole){ openRoleScreen(); return; }
-  applyRoleTheme(currentRole);
-  document.getElementById('main-app').classList.remove('hidden');
-  initApp();
-  toast('License activated!');
-}
-function activateLockedLicense(){
-  const raw=document.getElementById('locked-license-input').value;
-  if(!validateKey(raw)){ toast('Invalid license key','red'); return; }
-  localStorage.setItem('sgp_license', raw.trim().toUpperCase());
-  document.getElementById('locked-screen').style.display='none';
-  currentRole=localStorage.getItem('sgp_role');
-  if(!currentRole){ openRoleScreen(); return; }
-  applyRoleTheme(currentRole);
-  document.getElementById('main-app').classList.remove('hidden');
-  initApp();
-  toast('License activated!');
-}
-function hideLicenseScreen(){ document.getElementById('license-screen').style.display='none'; }
-function showLockedScreen(){ document.getElementById('locked-screen').style.display='flex'; }
-
-// ─────────────────── TRIAL BANNER ───────────────────
-function updateTrialBanner(){
-  const state=getAccessState();
-  const banner=document.getElementById('trial-banner');
-  if(state==='trial'){
-    const ts=parseInt(localStorage.getItem('sgp_trial_start'));
-    const daysLeft=Math.max(1,Math.ceil((TRIAL_DAYS*86400000-(Date.now()-ts))/86400000));
-    document.getElementById('trial-days-left').textContent=daysLeft;
-    banner.classList.remove('hidden');
-  } else {
-    banner.classList.add('hidden');
-  }
-}
-
 // ─────────────────── ROLE ───────────────────
 function applyRoleTheme(role){
   document.body.setAttribute('data-role',role);
@@ -1133,6 +1074,12 @@ function renderRoleCards(){
     </div>`;
   }).join('');
 }
+// ─────────────────── ACCESS CONTROL ───────────────────
+function openRoleScreen(){
+  document.getElementById('main-app').classList.add('hidden');
+  document.getElementById('role-screen').style.display='flex';
+  renderRoleCards();
+}
 function selectRole(roleId){
   localStorage.setItem('sgp_role',roleId);
   applyRoleTheme(roleId);
@@ -1144,7 +1091,6 @@ function selectRole(roleId){
 
 // ─────────────────── INIT ───────────────────
 function initApp(){
-  updateTrialBanner();
   // Nav date
   const nd=document.getElementById('nav-date');
   if(nd) nd.textContent=new Date().toLocaleDateString(currentLang==='fr'?'fr-FR':currentLang==='de'?'de-DE':'en-US',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
@@ -1744,17 +1690,11 @@ function toast(msg, color='green'){
 
 // ─────────────────── DOMCONTENTLOADED ───────────────────
 document.addEventListener('DOMContentLoaded',()=>{
-  const state=getAccessState();
-  if(state==='none') return; // license-screen visible by default
-  hideLicenseScreen();
-  if(state==='trial_expired'){ showLockedScreen(); return; }
-  // licensed or trial
   currentRole=localStorage.getItem('sgp_role');
   if(!currentRole){ openRoleScreen(); return; }
   applyRoleTheme(currentRole);
   document.getElementById('main-app').classList.remove('hidden');
   initApp();
-  updateTrialBanner();
 });
 </script>
 </body>
