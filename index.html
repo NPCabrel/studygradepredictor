@@ -1,162 +1,133 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Study Grade Predictor — by nague</title>
-  <meta name="description" content="Trackez votre temps d'étude, suivez votre progression et obtenez une prédiction précise de votre note finale. 5€ une seule fois."/>
+  <title>Study Grade Predictor — Free</title>
+  <meta name="description" content="Track your study time, monitor your progress, and get accurate predictions. Completely free web app for students, developers, researchers, and more."/>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet"/>
   <style>
     *{font-family:'Inter',sans-serif;scroll-behavior:smooth}
     .font-display{font-family:'Playfair Display',serif}
-    body{background:#06060d;color:#e2e8f0;overflow-x:hidden}
-    .gradient-text{background:linear-gradient(135deg,#a78bfa,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .gradient-text-warm{background:linear-gradient(135deg,#f472b6,#fb923c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    body{background:#0f0f13;color:#f1f5f9;overflow-x:hidden}
+    .gradient-text{background:linear-gradient(135deg,#8b5cf6,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
     .glow-btn{background:linear-gradient(135deg,#7c3aed,#0891b2);box-shadow:0 0 32px rgba(124,58,237,.45);transition:all .25s}
     .glow-btn:hover{box-shadow:0 0 48px rgba(124,58,237,.7);transform:translateY(-2px) scale(1.02)}
-    .glow-btn:active{transform:translateY(0) scale(1)}
-    .glass{background:rgba(255,255,255,.04);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08)}
-    .glass-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);transition:all .25s}
-    .glass-card:hover{background:rgba(255,255,255,.06);border-color:rgba(139,92,246,.3);transform:translateY(-4px)}
-    .noise{background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none}
-    .hero-glow{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,.18) 0%,transparent 70%);pointer-events:none}
-    .grade-badge{background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(6,182,212,.1));border:1px solid rgba(16,185,129,.3)}
+    .glass{background:rgba(255,255,255,.03);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.06)}
+    .glass-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);transition:all .25s}
+    .glass-card:hover{background:rgba(255,255,255,.05);border-color:rgba(139,92,246,.3);transform:translateY(-4px)}
+    .hero-glow{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(139,92,246,.15) 0%,transparent 70%);pointer-events:none}
     @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
     .float{animation:float 4s ease-in-out infinite}
     @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
     .fade-up{animation:fadeUp .7s ease both}
-    .delay-1{animation-delay:.1s}.delay-2{animation-delay:.2s}.delay-3{animation-delay:.3s}.delay-4{animation-delay:.4s}
+    .delay-1{animation-delay:.1s}.delay-2{animation-delay:.2s}.delay-3{animation-delay:.3s}
     @keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(124,58,237,.4)}70%{box-shadow:0 0 0 20px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
     .pulse-ring{animation:pulse-ring 2s ease infinite}
-    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(124,58,237,.4);border-radius:3px}
-    .step-line::after{content:'';position:absolute;left:50%;top:100%;width:2px;height:48px;background:linear-gradient(to bottom,rgba(124,58,237,.4),transparent);transform:translateX(-50%)}
-    .faq-item{border-bottom:1px solid rgba(255,255,255,.06)}
-    .faq-btn{width:100%;text-align:left;padding:1.25rem 0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;color:#cbd5e1;font-size:.95rem;font-weight:500}
-    .faq-content{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease}
-    .faq-content.open{max-height:200px;padding-bottom:1rem}
-    .faq-icon{transition:transform .3s;flex-shrink:0;margin-left:1rem}
-    .faq-item.open .faq-icon{transform:rotate(45deg)}
     .nav-link{color:#94a3b8;font-size:.9rem;font-weight:500;transition:color .2s}
     .nav-link:hover{color:#c4b5fd}
     .mobile-menu{transition:all .35s;max-height:0;overflow:hidden}
     .mobile-menu.open{max-height:400px}
     .badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);color:#c4b5fd;padding:.3rem .9rem;border-radius:9999px;font-size:.8rem;font-weight:600}
+    .role-icon{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px}
   </style>
 </head>
 <body>
-
-<!-- NOISE OVERLAY -->
-<div class="noise fixed inset-0 z-0 pointer-events-none"></div>
 
 <!-- NAV -->
 <nav class="glass sticky top-0 z-50 px-4 sm:px-8 py-4">
   <div class="max-w-6xl mx-auto flex items-center justify-between">
     <div class="flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-lg glow-btn flex items-center justify-center text-white font-black text-sm select-none">SG</div>
+      <div class="w-8 h-8 rounded-lg glow-btn flex items-center justify-center text-white font-black text-sm">SG</div>
       <span class="font-display text-lg text-white">Study Grade <span class="gradient-text">Predictor</span></span>
     </div>
     <div class="hidden md:flex items-center gap-8">
-      <a href="#features" class="nav-link">Fonctionnalités</a>
-      <a href="#how" class="nav-link">Comment ça marche</a>
-      <a href="#pricing" class="nav-link">Tarif</a>
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#roles" class="nav-link">Profiles</a>
+      <a href="#how" class="nav-link">How it works</a>
       <a href="#faq" class="nav-link">FAQ</a>
     </div>
     <div class="hidden md:flex items-center gap-3">
-      <a href="app.html" class="text-slate-400 text-sm font-medium hover:text-white transition px-3 py-1.5">Connexion →</a>
-      <a href="#pricing" class="glow-btn text-white text-sm font-semibold px-5 py-2.5 rounded-xl">Acheter — 5€</a>
+      <a href="app.html" class="glow-btn text-white text-sm font-semibold px-6 py-2.5 rounded-xl">Get Started Free →</a>
     </div>
-    <!-- Mobile hamburger -->
-    <button onclick="toggleMenu()" class="md:hidden text-slate-400 hover:text-white p-1" aria-label="menu">
+    <button onclick="toggleMenu()" class="md:hidden text-slate-400 hover:text-white p-1">
       <svg id="icon-menu" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
       <svg id="icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
   </div>
-  <!-- Mobile menu -->
   <div id="mobile-menu" class="mobile-menu md:hidden">
     <div class="max-w-6xl mx-auto flex flex-col gap-4 pt-4 pb-2">
-      <a href="#features" onclick="toggleMenu()" class="nav-link">Fonctionnalités</a>
-      <a href="#how" onclick="toggleMenu()" class="nav-link">Comment ça marche</a>
-      <a href="#pricing" onclick="toggleMenu()" class="nav-link">Tarif</a>
+      <a href="#features" onclick="toggleMenu()" class="nav-link">Features</a>
+      <a href="#roles" onclick="toggleMenu()" class="nav-link">Profiles</a>
+      <a href="#how" onclick="toggleMenu()" class="nav-link">How it works</a>
       <a href="#faq" onclick="toggleMenu()" class="nav-link">FAQ</a>
-      <a href="#pricing" class="glow-btn text-white text-sm font-semibold px-5 py-2.5 rounded-xl text-center mt-2">Acheter — 5€</a>
+      <a href="app.html" class="glow-btn text-white text-sm font-semibold px-5 py-2.5 rounded-xl text-center mt-2">Get Started Free →</a>
     </div>
   </div>
 </nav>
 
 <!-- HERO -->
-<section class="relative min-h-screen flex items-center justify-center px-4 py-24 overflow-hidden">
-  <div class="hero-glow top-0 left-1/4 -translate-x-1/2 -top-32 z-0"></div>
-  <div class="hero-glow bottom-0 right-1/4 translate-x-1/2 z-0 opacity-60"></div>
-
+<section class="relative min-h-screen flex items-center justify-center px-4 py-24">
+  <div class="hero-glow top-0 left-1/4 -translate-x-1/2 -top-32"></div>
+  <div class="hero-glow bottom-0 right-1/4 translate-x-1/2 opacity-60"></div>
   <div class="max-w-4xl mx-auto text-center z-10">
-    <div class="badge mb-6 fade-up">✦ Paiement unique · Aucun abonnement</div>
-
+    <div class="badge mb-6 fade-up">✦ Completely Free · No signup required</div>
     <h1 class="font-display text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 fade-up delay-1">
-      Pilotez votre<br/><span class="gradient-text">réussite académique</span>
+      Take control of your<br/><span class="gradient-text">productivity</span>
     </h1>
-
     <p class="text-slate-400 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed fade-up delay-2">
-      Trackez votre temps d'étude, enregistrez vos résultats, et obtenez une <strong class="text-slate-200">prédiction précise de votre note</strong> sur le barème 1,0 – 4,0 avant même de passer l'examen.
+      Track your time, monitor progress, and get accurate predictions. <strong class="text-slate-200">7 profiles</strong> tailored for students, developers, researchers, and more.
     </p>
-
     <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 fade-up delay-3">
-      <a href="#pricing" class="glow-btn pulse-ring text-white font-bold px-8 py-4 rounded-2xl text-lg w-full sm:w-auto">
-        Obtenir l'accès — <span class="line-through opacity-50 text-base">15€</span> 5€
+      <a href="app.html" class="glow-btn pulse-ring text-white font-bold px-8 py-4 rounded-2xl text-lg w-full sm:w-auto">
+        Start Using Free →
       </a>
-      <a href="app.html" class="glass text-slate-300 font-medium px-8 py-4 rounded-2xl text-base hover:text-white hover:border-violet-500/40 transition w-full sm:w-auto text-center">
-        Voir la démo →
+      <a href="#features" class="glass text-slate-300 font-medium px-8 py-4 rounded-2xl text-base hover:text-white transition w-full sm:w-auto text-center">
+        Learn more
       </a>
     </div>
 
-    <!-- MOCK UI PREVIEW -->
-    <div class="float fade-up delay-4">
+    <!-- Preview -->
+    <div class="float fade-up delay-3">
       <div class="glass rounded-3xl p-1 max-w-3xl mx-auto shadow-2xl" style="box-shadow:0 0 80px rgba(124,58,237,.2)">
-        <div class="rounded-2xl overflow-hidden bg-[#0a0a14] p-5">
-          <!-- Fake stats row -->
+        <div class="rounded-2xl overflow-hidden bg-[#0a0a0e] p-5">
           <div class="grid grid-cols-4 gap-2 mb-4">
-            <div class="bg-violet-900/30 border border-violet-500/20 rounded-xl p-2.5 text-center">
-              <div class="text-violet-400 font-bold text-lg">3</div>
-              <div class="text-slate-600 text-xs">Matières</div>
+            <div class="bg-violet-900/20 border border-violet-500/20 rounded-xl p-2.5 text-center">
+              <div class="text-violet-400 font-bold text-lg">7</div>
+              <div class="text-slate-600 text-xs">Profiles</div>
             </div>
             <div class="bg-cyan-900/20 border border-cyan-500/20 rounded-xl p-2.5 text-center">
-              <div class="text-cyan-400 font-bold text-lg">42h</div>
-              <div class="text-slate-600 text-xs">Temps total</div>
+              <div class="text-cyan-400 font-bold text-lg">∞</div>
+              <div class="text-slate-600 text-xs">Sessions</div>
             </div>
             <div class="bg-emerald-900/20 border border-emerald-500/20 rounded-xl p-2.5 text-center">
-              <div class="text-emerald-400 font-bold text-lg">78%</div>
-              <div class="text-slate-600 text-xs">Score moy.</div>
+              <div class="text-emerald-400 font-bold text-lg">3</div>
+              <div class="text-slate-600 text-xs">Languages</div>
             </div>
             <div class="bg-amber-900/20 border border-amber-500/20 rounded-xl p-2.5 text-center">
-              <div class="text-amber-400 font-bold text-lg">2.1h</div>
-              <div class="text-slate-600 text-xs">Aujourd'hui</div>
+              <div class="text-amber-400 font-bold text-lg">0€</div>
+              <div class="text-slate-600 text-xs">Forever</div>
             </div>
           </div>
-          <!-- Fake prediction card -->
           <div class="grid grid-cols-3 gap-2">
-            <div class="bg-slate-900/60 border border-white/5 rounded-xl p-3 text-center col-span-1">
-              <div class="text-xs text-slate-500 mb-1">Note prédite</div>
-              <div class="text-2xl font-bold text-emerald-400">1.7</div>
-              <div class="text-xs text-emerald-600">Bien</div>
-              <div class="w-full bg-slate-800 rounded-full h-1 mt-2">
-                <div class="h-1 rounded-full bg-emerald-500" style="width:83%"></div>
-              </div>
+            <div class="bg-slate-900/60 border border-white/5 rounded-xl p-3 text-center">
+              <div class="text-xs text-slate-500 mb-1">Predicted Success</div>
+              <div class="text-2xl font-bold text-emerald-400">87%</div>
+              <div class="w-full bg-slate-800 rounded-full h-1 mt-2"><div class="h-1 rounded-full bg-emerald-500" style="width:87%"></div></div>
             </div>
-            <div class="bg-slate-900/60 border border-white/5 rounded-xl p-3 text-center col-span-1">
+            <div class="bg-slate-900/60 border border-white/5 rounded-xl p-3 text-center">
               <svg viewBox="0 0 100 100" class="w-12 h-12 mx-auto -rotate-90">
                 <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="10"/>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#10b981" stroke-width="10" stroke-dasharray="215 238.8" stroke-linecap="round"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#8b5cf6" stroke-width="10" stroke-dasharray="200 238.8" stroke-linecap="round"/>
               </svg>
-              <div class="text-xs text-slate-500 -mt-1">Réussite</div>
-              <div class="text-emerald-400 font-bold text-sm">90%</div>
+              <div class="text-xs text-slate-500">Progress</div>
             </div>
-            <div class="bg-slate-900/60 border border-white/5 rounded-xl p-3 col-span-1 flex flex-col justify-center gap-1.5">
-              <div class="text-xs text-slate-600">Temps</div>
+            <div class="bg-slate-900/60 border border-white/5 rounded-xl p-3 flex flex-col justify-center gap-1.5">
+              <div class="text-xs text-slate-600">Time</div>
               <div class="w-full bg-slate-800 rounded-full h-1"><div class="h-1 bg-cyan-500 rounded-full" style="width:70%"></div></div>
               <div class="text-xs text-slate-600">Score</div>
               <div class="w-full bg-slate-800 rounded-full h-1"><div class="h-1 bg-violet-500 rounded-full" style="width:85%"></div></div>
-              <div class="text-xs text-slate-600">Régularité</div>
-              <div class="w-full bg-slate-800 rounded-full h-1"><div class="h-1 bg-amber-500 rounded-full" style="width:60%"></div></div>
             </div>
           </div>
         </div>
@@ -165,184 +136,132 @@
   </div>
 </section>
 
-<!-- SOCIAL PROOF STRIP -->
-<div class="glass border-y border-white/5 py-5 px-4">
-  <div class="max-w-4xl mx-auto flex flex-wrap justify-center gap-8 text-center">
-    <div><div class="text-2xl font-bold text-white">1,0 → 4,0</div><div class="text-slate-500 text-xs mt-0.5">Barème allemand officiel</div></div>
-    <div class="hidden sm:block w-px bg-white/10"></div>
-    <div><div class="text-2xl font-bold text-white">3 langues</div><div class="text-slate-500 text-xs mt-0.5">FR · EN · DE</div></div>
-    <div class="hidden sm:block w-px bg-white/10"></div>
-    <div><div class="text-2xl font-bold text-white">100% web</div><div class="text-slate-500 text-xs mt-0.5">Mobile & desktop</div></div>
-    <div class="hidden sm:block w-px bg-white/10"></div>
-    <div><div class="text-2xl font-bold text-white">5€</div><div class="text-slate-500 text-xs mt-0.5">Accès à vie · Une fois</div></div>
+<!-- PROFILES -->
+<section id="roles" class="py-24 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="badge mb-4">7 Profiles</div>
+      <h2 class="font-display text-3xl sm:text-5xl font-bold text-white mb-4">Choose your <span class="gradient-text">workspace</span></h2>
+      <p class="text-slate-400 max-w-xl mx-auto">Each profile adapts the interface, terminology, and predictions to your specific needs.</p>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div class="glass-card rounded-2xl p-6">
+        <div class="role-icon bg-violet-500/15">🎓</div>
+        <h3 class="font-semibold text-white mb-2">Student</h3>
+        <p class="text-slate-500 text-sm">Courses, exam prep, grade prediction on the 1.0-4.0 scale.</p>
+      </div>
+      <div class="glass-card rounded-2xl p-6">
+        <div class="role-icon bg-blue-500/15">💻</div>
+        <h3 class="font-semibold text-white mb-2">Developer</h3>
+        <p class="text-slate-500 text-sm">Coding projects, sprints, delivery probability tracking.</p>
+      </div>
+      <div class="glass-card rounded-2xl p-6">
+        <div class="role-icon bg-emerald-500/15">🔬</div>
+        <h3 class="font-semibold text-white mb-2">Researcher</h3>
+        <p class="text-slate-500 text-sm">Academic research, publications, maturity scoring.</p>
+      </div>
+      <div class="glass-card rounded-2xl p-6">
+        <div class="role-icon bg-amber-500/15">💼</div>
+        <h3 class="font-semibold text-white mb-2">Freelancer</h3>
+        <p class="text-slate-500 text-sm">Client projects, billable hours, on-time delivery.</p>
+      </div>
+      <div class="glass-card rounded-2xl p-6">
+        <div class="role-icon bg-pink-500/15">🎨</div>
+        <h3 class="font-semibold text-white mb-2">Designer</h3>
+        <p class="text-slate-500 text-sm">Creative projects, revisions, client satisfaction.</p>
+      </div>
+      <div class="glass-card rounded-2xl p-6">
+        <div class="role-icon bg-indigo-500/15">📚</div>
+        <h3 class="font-semibold text-white mb-2">Teacher</h3>
+        <p class="text-slate-500 text-sm">Curriculum planning, grading, student success tracking.</p>
+      </div>
+      <div class="glass-card rounded-2xl p-6 sm:col-span-2 lg:col-span-3 max-w-md mx-auto">
+        <div class="role-icon bg-orange-500/15">📋</div>
+        <h3 class="font-semibold text-white mb-2">Manager</h3>
+        <p class="text-slate-500 text-sm">Team projects, KPIs, goal achievement probability.</p>
+      </div>
+    </div>
   </div>
-</div>
+</section>
 
 <!-- FEATURES -->
 <section id="features" class="py-24 px-4">
   <div class="max-w-6xl mx-auto">
     <div class="text-center mb-16">
-      <div class="badge mb-4">Fonctionnalités</div>
-      <h2 class="font-display text-3xl sm:text-5xl font-bold text-white mb-4">Tout ce dont vous avez besoin<br/><span class="gradient-text">pour réussir</span></h2>
-      <p class="text-slate-400 max-w-xl mx-auto">Un outil complet qui transforme votre façon d'étudier en données concrètes et prédictions fiables.</p>
+      <div class="badge mb-4">Features</div>
+      <h2 class="font-display text-3xl sm:text-5xl font-bold text-white mb-4">Everything you need to <span class="gradient-text">succeed</span></h2>
     </div>
-
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-
       <div class="glass-card rounded-2xl p-6">
         <div class="w-11 h-11 rounded-xl bg-violet-500/15 flex items-center justify-center text-2xl mb-4">⏱️</div>
-        <h3 class="font-semibold text-white mb-2">Timer de session</h3>
-        <p class="text-slate-500 text-sm leading-relaxed">Chronomètre intégré avec objectif de temps, barre de progression et modes Étude / Pratique / Révision / Simulation.</p>
+        <h3 class="font-semibold text-white mb-2">Session Timer</h3>
+        <p class="text-slate-500 text-sm">Built-in stopwatch with live tracking and session modes tailored to your profile.</p>
       </div>
-
       <div class="glass-card rounded-2xl p-6">
         <div class="w-11 h-11 rounded-xl bg-cyan-500/15 flex items-center justify-center text-2xl mb-4">🎯</div>
-        <h3 class="font-semibold text-white mb-2">Suivi des scores</h3>
-        <p class="text-slate-500 text-sm leading-relaxed">Enregistrez quizz, exercices, examens blancs et auto-évaluations. La progression se met à jour automatiquement (temps 60% + score 40%).</p>
+        <h3 class="font-semibold text-white mb-2">Score Tracking</h3>
+        <p class="text-slate-500 text-sm">Log quizzes, exercises, deliverables and track your improvement over time.</p>
       </div>
-
       <div class="glass-card rounded-2xl p-6">
         <div class="w-11 h-11 rounded-xl bg-emerald-500/15 flex items-center justify-center text-2xl mb-4">🔮</div>
-        <h3 class="font-semibold text-white mb-2">Prédiction de note</h3>
-        <p class="text-slate-500 text-sm leading-relaxed">Algorithme sigmoïde qui calcule votre note prédite sur le barème officiel 1,0 · 1,3 · 1,7 · 2,0 · 2,3 · 2,7 · 3,0 · 3,3 · 3,7 · 4,0.</p>
+        <h3 class="font-semibold text-white mb-2">Smart Predictions</h3>
+        <p class="text-slate-500 text-sm">AI-powered predictions for grades, delivery probability, or success scores.</p>
       </div>
-
       <div class="glass-card rounded-2xl p-6">
         <div class="w-11 h-11 rounded-xl bg-amber-500/15 flex items-center justify-center text-2xl mb-4">📊</div>
-        <h3 class="font-semibold text-white mb-2">Analytique visuelle</h3>
-        <p class="text-slate-500 text-sm leading-relaxed">Graphiques interactifs : temps par matière, notes prédites, activité des 7 derniers jours. Tout en un coup d'œil.</p>
+        <h3 class="font-semibold text-white mb-2">Visual Analytics</h3>
+        <p class="text-slate-500 text-sm">Interactive charts showing time distribution, weekly activity, and progress.</p>
       </div>
-
       <div class="glass-card rounded-2xl p-6">
         <div class="w-11 h-11 rounded-xl bg-pink-500/15 flex items-center justify-center text-2xl mb-4">🌍</div>
-        <h3 class="font-semibold text-white mb-2">3 langues</h3>
-        <p class="text-slate-500 text-sm leading-relaxed">Interface entièrement disponible en Français, English et Deutsch. Changeable en un clic, mémorisée automatiquement.</p>
+        <h3 class="font-semibold text-white mb-2">3 Languages</h3>
+        <p class="text-slate-500 text-sm">Full interface in English, Français, and Deutsch. Switch anytime.</p>
       </div>
-
       <div class="glass-card rounded-2xl p-6">
         <div class="w-11 h-11 rounded-xl bg-indigo-500/15 flex items-center justify-center text-2xl mb-4">📱</div>
-        <h3 class="font-semibold text-white mb-2">Mobile & desktop</h3>
-        <p class="text-slate-500 text-sm leading-relaxed">App web responsive, fonctionne parfaitement sur smartphone, tablette et ordinateur. Aucune installation requise.</p>
+        <h3 class="font-semibold text-white mb-2">Works Everywhere</h3>
+        <p class="text-slate-500 text-sm">Fully responsive. Works on phone, tablet, and desktop. No installation needed.</p>
       </div>
-
     </div>
   </div>
 </section>
 
 <!-- HOW IT WORKS -->
-<section id="how" class="py-24 px-4 relative">
-  <div class="hero-glow left-0 top-1/2 -translate-y-1/2 opacity-40"></div>
+<section id="how" class="py-24 px-4">
   <div class="max-w-4xl mx-auto">
     <div class="text-center mb-16">
-      <div class="badge mb-4">Simple & rapide</div>
-      <h2 class="font-display text-3xl sm:text-5xl font-bold text-white mb-4">3 étapes pour<br/><span class="gradient-text">voir votre note</span></h2>
+      <div class="badge mb-4">Simple & Fast</div>
+      <h2 class="font-display text-3xl sm:text-5xl font-bold text-white mb-4">Get started in <span class="gradient-text">3 steps</span></h2>
     </div>
-
-    <div class="grid sm:grid-cols-3 gap-8 relative">
-      <div class="text-center relative step-line sm:step-line-h">
+    <div class="grid sm:grid-cols-3 gap-8">
+      <div class="text-center">
         <div class="w-16 h-16 rounded-2xl glow-btn flex items-center justify-center text-white font-bold text-2xl mx-auto mb-5">1</div>
-        <h3 class="font-semibold text-white mb-2">Ajoutez une matière</h3>
-        <p class="text-slate-500 text-sm">Nom, catégorie, difficulté, heures cible et date d'examen.</p>
+        <h3 class="font-semibold text-white mb-2">Choose Profile</h3>
+        <p class="text-slate-500 text-sm">Select from 7 profiles — Student, Developer, Researcher, and more.</p>
       </div>
-      <div class="text-center relative">
+      <div class="text-center">
         <div class="w-16 h-16 rounded-2xl glow-btn flex items-center justify-center text-white font-bold text-2xl mx-auto mb-5">2</div>
-        <h3 class="font-semibold text-white mb-2">Étudiez & loggez</h3>
-        <p class="text-slate-500 text-sm">Démarrez un timer, terminez la session, enregistrez vos scores.</p>
+        <h3 class="font-semibold text-white mb-2">Add Projects</h3>
+        <p class="text-slate-500 text-sm">Create projects, set targets, and start tracking your time.</p>
       </div>
       <div class="text-center">
         <div class="w-16 h-16 rounded-2xl glow-btn flex items-center justify-center text-white font-bold text-2xl mx-auto mb-5">3</div>
-        <h3 class="font-semibold text-white mb-2">Lisez la prédiction</h3>
-        <p class="text-slate-500 text-sm">Note prédite sur 4,0, probabilité de réussite, et facteurs d'amélioration.</p>
+        <h3 class="font-semibold text-white mb-2">See Predictions</h3>
+        <p class="text-slate-500 text-sm">Get real-time predictions and insights to achieve your goals.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- GRADE SCALE -->
-<section class="py-16 px-4">
-  <div class="max-w-3xl mx-auto">
-    <div class="glass rounded-3xl p-8 text-center">
-      <div class="badge mb-5 mx-auto w-fit">Barème officiel</div>
-      <h3 class="font-display text-2xl font-bold text-white mb-6">Toutes les notes reconnues</h3>
-      <div class="flex flex-wrap justify-center gap-3">
-        <div class="grade-badge px-4 py-2 rounded-xl text-center">
-          <div class="text-emerald-400 font-bold text-lg">1,0</div><div class="text-slate-500 text-xs">Sehr gut</div>
-        </div>
-        <div class="grade-badge px-4 py-2 rounded-xl text-center">
-          <div class="text-emerald-400 font-bold text-lg">1,3</div><div class="text-slate-500 text-xs">Sehr gut</div>
-        </div>
-        <div class="grade-badge px-4 py-2 rounded-xl text-center">
-          <div class="text-emerald-400 font-bold text-lg">1,7</div><div class="text-slate-500 text-xs">Gut</div>
-        </div>
-        <div class="grade-badge px-4 py-2 rounded-xl text-center">
-          <div class="text-cyan-400 font-bold text-lg">2,0</div><div class="text-slate-500 text-xs">Gut</div>
-        </div>
-        <div class="grade-badge px-4 py-2 rounded-xl text-center">
-          <div class="text-cyan-400 font-bold text-lg">2,3</div><div class="text-slate-500 text-xs">Gut</div>
-        </div>
-        <div class="grade-badge px-4 py-2 rounded-xl text-center">
-          <div class="text-cyan-400 font-bold text-lg">2,7</div><div class="text-slate-500 text-xs">Befriedigend</div>
-        </div>
-        <div class="grade-badge px-4 py-2 rounded-xl text-center">
-          <div class="text-amber-400 font-bold text-lg">3,0</div><div class="text-slate-500 text-xs">Befriedigend</div>
-        </div>
-        <div class="grade-badge px-4 py-2 rounded-xl text-center">
-          <div class="text-amber-400 font-bold text-lg">3,3</div><div class="text-slate-500 text-xs">Befriedigend</div>
-        </div>
-        <div class="grade-badge px-4 py-2 rounded-xl text-center">
-          <div class="text-amber-400 font-bold text-lg">3,7</div><div class="text-slate-500 text-xs">Ausreichend</div>
-        </div>
-        <div class="px-4 py-2 rounded-xl text-center bg-orange-500/10 border border-orange-500/25">
-          <div class="text-orange-400 font-bold text-lg">4,0</div><div class="text-slate-500 text-xs">Min. pour valider ✓</div>
-        </div>
-      </div>
-      <p class="text-slate-600 text-xs mt-5">Au-dessus de 4,0 → non validé. Notre algorithme vous prédit si vous franchissez ce seuil.</p>
-    </div>
-  </div>
-</section>
-
-<!-- PRICING -->
-<section id="pricing" class="py-24 px-4 relative">
-  <div class="hero-glow right-0 top-1/2 -translate-y-1/2 opacity-50"></div>
-  <div class="max-w-lg mx-auto text-center">
-    <div class="badge mb-6 mx-auto w-fit">Tarif</div>
-    <h2 class="font-display text-3xl sm:text-5xl font-bold text-white mb-4">Simple.<br/><span class="gradient-text">5€ une seule fois.</span></h2>
-    <p class="text-slate-400 mb-10">Pas d'abonnement. Pas de surprise. Accès à vie.</p>
-
-    <div class="glass rounded-3xl p-8 text-left relative overflow-hidden" style="border-color:rgba(139,92,246,.35)">
-      <div class="absolute top-0 right-0 w-48 h-48 bg-violet-600/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="flex items-start justify-between mb-6">
-        <div>
-          <div class="font-display text-2xl font-bold text-white">Study Grade Predictor</div>
-          <div class="text-slate-500 text-sm mt-0.5">by nague</div>
-        </div>
-        <div class="text-right">
-          <div class="text-slate-500 line-through text-sm">15€</div>
-          <div class="text-4xl font-black gradient-text">5€</div>
-        </div>
-      </div>
-
-      <ul class="space-y-3 mb-8 text-sm text-slate-300">
-        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> App web complète (mobile + desktop)</li>
-        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Timer de sessions illimité</li>
-        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Matières illimitées</li>
-        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Prédiction de note (barème 1,0–4,0)</li>
-        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Analytique avec graphiques</li>
-        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> 3 langues (FR · EN · DE)</li>
-        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Clé de licence personnelle</li>
-        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Accès à vie · Mises à jour incluses</li>
-        <li class="flex items-center gap-2.5"><span class="text-emerald-400 text-base">✓</span> Paiement sécurisé via Gumroad</li>
-      </ul>
-
-      <!-- Replace YOUR_GUMROAD_URL with your actual Gumroad product URL -->
-      <a href="https://nague.gumroad.com/l/nagDev" target="_blank" rel="noopener"
-        class="glow-btn block text-center text-white font-bold py-4 rounded-2xl text-lg mb-4">
-        Acheter maintenant — 5€
-      </a>
-      <p class="text-center text-slate-600 text-xs">Paiement sécurisé · CB, PayPal · Reçu par email · TVA incluse</p>
-    </div>
-
-    <p class="text-slate-600 text-xs mt-6">Déjà client ? <a href="app.html" class="text-violet-400 hover:underline">Accéder à l'app →</a></p>
+<!-- CTA -->
+<section class="py-20 px-4">
+  <div class="max-w-3xl mx-auto text-center">
+    <h2 class="font-display text-3xl sm:text-4xl font-bold text-white mb-4">Ready to boost your <span class="gradient-text">productivity?</span></h2>
+    <p class="text-slate-400 mb-8">Join thousands of users who track their progress and achieve their goals.</p>
+    <a href="app.html" class="glow-btn inline-block text-white font-bold px-10 py-4 rounded-2xl text-lg">
+      Get Started Free →
+    </a>
+    <p class="text-slate-600 text-sm mt-4">No signup required · Works in your browser</p>
   </div>
 </section>
 
@@ -350,72 +269,56 @@
 <section id="faq" class="py-20 px-4">
   <div class="max-w-2xl mx-auto">
     <div class="text-center mb-12">
-      <div class="badge mb-4 mx-auto w-fit">FAQ</div>
-      <h2 class="font-display text-3xl font-bold text-white">Questions fréquentes</h2>
+      <div class="badge mb-4">FAQ</div>
+      <h2 class="font-display text-3xl font-bold text-white">Frequently asked questions</h2>
     </div>
-
     <div class="space-y-0">
-      <div class="faq-item">
+      <div class="faq-item border-b border-white/6">
         <button class="faq-btn" onclick="toggleFaq(this)">
-          Comment est-ce que j'accède à l'app après l'achat ?
+          Is it really free?
           <span class="faq-icon text-violet-400 text-xl">+</span>
         </button>
         <div class="faq-content text-slate-500 text-sm leading-relaxed">
-          Après paiement sur Gumroad, vous recevez immédiatement une <strong class="text-slate-300">clé de licence unique</strong> par email. Rendez-vous sur cette page, cliquez sur "Accéder à l'app", saisissez votre clé et c'est parti — accès permanent depuis n'importe quel navigateur.
+          <strong class="text-slate-300">Yes, completely free.</strong> No hidden fees, no subscription, no limits. All features are available to everyone.
         </div>
       </div>
-
-      <div class="faq-item">
+      <div class="faq-item border-b border-white/6">
         <button class="faq-btn" onclick="toggleFaq(this)">
-          L'app fonctionne-t-elle sur téléphone ?
+          Do I need to create an account?
           <span class="faq-icon text-violet-400 text-xl">+</span>
         </button>
         <div class="faq-content text-slate-500 text-sm leading-relaxed">
-          Oui, entièrement. L'interface est <strong class="text-slate-300">responsive</strong> et optimisée pour mobile, tablette et desktop. Aucune installation requise — tout fonctionne directement dans votre navigateur.
+          <strong class="text-slate-300">No account needed.</strong> Your data is stored locally in your browser. Just open the app and start using it immediately.
         </div>
       </div>
-
-      <div class="faq-item">
+      <div class="faq-item border-b border-white/6">
         <button class="faq-btn" onclick="toggleFaq(this)">
-          Mes données sont-elles sauvegardées ?
+          Can I switch profiles later?
           <span class="faq-icon text-violet-400 text-xl">+</span>
         </button>
         <div class="faq-content text-slate-500 text-sm leading-relaxed">
-          Vos données sont stockées localement dans votre navigateur (localStorage). Elles persistent entre les sessions. Pour les retrouver sur un autre appareil, utilisez le même navigateur et profil.
+          <strong class="text-slate-300">Yes, anytime.</strong> Click your current profile in the navbar to switch between Student, Developer, Researcher, and other profiles.
         </div>
       </div>
-
-      <div class="faq-item">
+      <div class="faq-item border-b border-white/6">
         <button class="faq-btn" onclick="toggleFaq(this)">
-          Comment fonctionne la prédiction de note ?
+          Does it work on mobile?
           <span class="faq-icon text-violet-400 text-xl">+</span>
         </button>
         <div class="faq-content text-slate-500 text-sm leading-relaxed">
-          L'algorithme analyse 4 facteurs : temps d'étude vs objectif (35%), score moyen (40%), régularité des sessions (15%), et tendance récente (10%). Un modèle sigmoïde convertit ce score en note officielle sur le barème 1,0–4,0.
+          <strong class="text-slate-300">Yes, fully responsive.</strong> The app works perfectly on smartphones, tablets, and desktop computers.
         </div>
       </div>
-
-      <div class="faq-item">
+      <div class="faq-item border-b border-white/6">
         <button class="faq-btn" onclick="toggleFaq(this)">
-          Y a-t-il un remboursement possible ?
+          Is my data safe?
           <span class="faq-icon text-violet-400 text-xl">+</span>
         </button>
         <div class="faq-content text-slate-500 text-sm leading-relaxed">
-          Oui, Gumroad propose un remboursement sous 30 jours si l'app ne vous convient pas. Contactez simplement le support via votre reçu Gumroad.
+          <strong class="text-slate-300">Your data stays on your device.</strong> Everything is stored locally in your browser. We don't collect or store any of your data on our servers.
         </div>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- CTA FOOTER STRIP -->
-<section class="py-20 px-4">
-  <div class="max-w-3xl mx-auto text-center">
-    <h2 class="font-display text-3xl sm:text-4xl font-bold text-white mb-4">Prêt à maîtriser vos<br/><span class="gradient-text">résultats académiques ?</span></h2>
-    <p class="text-slate-400 mb-8">Rejoignez les étudiants qui pilotent leur réussite avec des données réelles.</p>
-    <a href="#pricing" class="glow-btn inline-block text-white font-bold px-10 py-4 rounded-2xl text-lg">
-      Obtenir l'accès — 5€
-    </a>
   </div>
 </section>
 
@@ -427,37 +330,22 @@
       <span class="text-slate-400 text-sm">Study Grade Predictor <span class="text-slate-600">by</span> <span class="text-violet-400 font-semibold">nague</span></span>
     </div>
     <div class="flex items-center gap-6 text-slate-600 text-xs">
-      <a href="app.html" class="hover:text-slate-400 transition">Accéder à l'app</a>
-      <span>© 2025 nague. Tous droits réservés.</span>
+      <a href="app.html" class="hover:text-slate-400 transition">Open App</a>
+      <span>© 2025 nague. All rights reserved.</span>
     </div>
   </div>
 </footer>
 
 <script>
 function toggleMenu(){
-  const m=document.getElementById('mobile-menu');
-  const i1=document.getElementById('icon-menu');
-  const i2=document.getElementById('icon-close');
-  m.classList.toggle('open');
-  i1.classList.toggle('hidden');
-  i2.classList.toggle('hidden');
+  const m=document.getElementById('mobile-menu'),i1=document.getElementById('icon-menu'),i2=document.getElementById('icon-close');
+  m.classList.toggle('open');i1.classList.toggle('hidden');i2.classList.toggle('hidden');
 }
 function toggleFaq(btn){
-  const item=btn.parentElement;
-  const content=item.querySelector('.faq-content');
-  const isOpen=item.classList.contains('open');
-  // close all
-  document.querySelectorAll('.faq-item').forEach(el=>{
-    el.classList.remove('open');
-    el.querySelector('.faq-content').classList.remove('open');
-  });
-  if(!isOpen){item.classList.add('open');content.classList.add('open');}
+  const item=btn.parentElement,content=item.querySelector('.faq-content'),isOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(el=>{el.classList.remove('open');el.querySelector('.faq-content').style.maxHeight='0';el.querySelector('.faq-content').style.paddingBottom='0';});
+  if(!isOpen){item.classList.add('open');content.style.maxHeight='200px';content.style.paddingBottom='1rem';}
 }
-// Smooth nav close on link click
-document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',()=>{
-  const m=document.getElementById('mobile-menu');
-  if(m.classList.contains('open'))toggleMenu();
-}));
 </script>
 </body>
 </html>
