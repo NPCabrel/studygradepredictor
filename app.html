@@ -1,1010 +1,1834 @@
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Study Grade Predictor — App</title>
-  <meta name="theme-color" content="#0a0a0f"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
-  <style>
-    *{font-family:'Inter',sans-serif}
-    .font-display{font-family:'Playfair Display',serif}
-    body{background:#0a0a0f;color:#e2e8f0;overflow-x:hidden}
-    .glass{background:rgba(255,255,255,.04);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08)}
-    .glass-hover:hover{background:rgba(255,255,255,.07);border-color:rgba(139,92,246,.35);transition:all .2s}
-    .gradient-text{background:linear-gradient(135deg,#8b5cf6,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .gradient-btn{background:linear-gradient(135deg,#7c3aed,#0891b2);transition:opacity .2s,transform .1s}
-    .gradient-btn:hover{opacity:.88;transform:translateY(-1px)}
-    .gradient-btn:active{transform:translateY(0)}
-    .progress-bar{background:linear-gradient(90deg,#7c3aed,#06b6d4);transition:width .6s cubic-bezier(.4,0,.2,1)}
-    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(139,92,246,.4);border-radius:3px}
-    .tab-active{background:rgba(139,92,246,.2);border-bottom:2px solid #8b5cf6;color:#c4b5fd}
-    .modal-bg{background:rgba(0,0,0,.75);backdrop-filter:blur(6px)}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    .fade-in{animation:fadeIn .25s ease}
-    @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
-    .pulse-dot{animation:pulse-dot 1.2s infinite}
-    .stat-card{border-left:3px solid}
-    .border-violet{border-color:#8b5cf6}.border-cyan{border-color:#06b6d4}
-    .border-emerald{border-color:#10b981}.border-amber{border-color:#f59e0b}
-    input,select,textarea{background:rgba(255,255,255,.05)!important;border:1px solid rgba(255,255,255,.1)!important;color:#e2e8f0!important;border-radius:8px;outline:none}
-    input:focus,select:focus,textarea:focus{border-color:rgba(139,92,246,.6)!important;box-shadow:0 0 0 3px rgba(139,92,246,.15)}
-    select option{background:#1a1a2e;color:#e2e8f0}
-    .lang-btn{transition:all .15s}
-    .lang-btn.active{background:rgba(139,92,246,.25);color:#c4b5fd;border-color:rgba(139,92,246,.5)}
-    /* LICENSE SCREEN */
-    .license-screen{position:fixed;inset:0;z-index:100;background:#06060d;display:flex;align-items:center;justify-content:center;padding:1rem}
-    .license-glow{position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(124,58,237,.15) 0%,transparent 70%);pointer-events:none}
-    @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
-    .shake{animation:shake .4s ease}
-    input[type="text"]#license-input{text-transform:uppercase;letter-spacing:.1em;font-size:1.1rem;text-align:center;font-weight:600}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Study Grade Predictor — by nague</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root,[data-role="student"]{--accent:#8b5cf6;--accent2:#06b6d4;--accent-dark:#7c3aed;--accent-light:#c4b5fd;--accent-rgb:139,92,246}
+[data-role="developer"]{--accent:#3b82f6;--accent2:#06b6d4;--accent-dark:#2563eb;--accent-light:#93c5fd;--accent-rgb:59,130,246}
+[data-role="researcher"]{--accent:#10b981;--accent2:#06b6d4;--accent-dark:#059669;--accent-light:#6ee7b7;--accent-rgb:16,185,129}
+[data-role="freelancer"]{--accent:#f59e0b;--accent2:#f97316;--accent-dark:#d97706;--accent-light:#fcd34d;--accent-rgb:245,158,11}
+[data-role="designer"]{--accent:#ec4899;--accent2:#8b5cf6;--accent-dark:#db2777;--accent-light:#f9a8d4;--accent-rgb:236,72,153}
+[data-role="teacher"]{--accent:#6366f1;--accent2:#8b5cf6;--accent-dark:#4f46e5;--accent-light:#a5b4fc;--accent-rgb:99,102,241}
+[data-role="manager"]{--accent:#f97316;--accent2:#ef4444;--accent-dark:#ea580c;--accent-light:#fdba74;--accent-rgb:249,115,22}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#0a0a0f;color:#e2e8f0;font-family:'Inter',system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#0f0f1a}
+::-webkit-scrollbar-thumb{background:rgba(var(--accent-rgb),.4);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(var(--accent-rgb),.7)}
+
+/* Gradient btn */
+.gradient-btn{background:linear-gradient(135deg,var(--accent-dark),var(--accent2));border:none;color:#fff;cursor:pointer;transition:opacity .2s,transform .15s}
+.gradient-btn:hover{opacity:.9;transform:translateY(-1px)}
+.gradient-btn:active{transform:translateY(0)}
+
+/* Gradient text */
+.gradient-text{background:linear-gradient(135deg,var(--accent-dark),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* Progress bar */
+.progress-bar{background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;height:6px;transition:width .6s ease}
+
+/* Tab active */
+.tab-active{background:rgba(var(--accent-rgb),.12);border-color:var(--accent)!important;color:var(--accent-light)!important}
+
+/* Glass */
+.glass{background:rgba(255,255,255,.03);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.07)}
+.glass-card{background:rgba(15,15,30,.6);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.07);border-radius:16px}
+
+/* Input */
+.inp{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#e2e8f0;padding:10px 14px;width:100%;font-size:.9rem;transition:border-color .2s}
+.inp:focus{outline:none;border-color:var(--accent)}
+
+/* Select */
+select.inp option{background:#1a1a2e;color:#e2e8f0}
+
+/* Modal overlay */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:50;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal-box{background:#0f0f1a;border:1px solid rgba(255,255,255,.1);border-radius:20px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;padding:2rem}
+
+/* Toast */
+#toast-container{position:fixed;bottom:1.5rem;right:1.5rem;z-index:100;display:flex;flex-direction:column;gap:.5rem}
+.toast{background:#1a1a2e;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.75rem 1.25rem;font-size:.85rem;color:#e2e8f0;animation:slideIn .3s ease;max-width:280px}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* Role card hover */
+.role-card{border:2px solid rgba(255,255,255,.06);transition:border-color .2s,transform .2s,box-shadow .2s;cursor:pointer}
+.role-card:hover{transform:translateY(-4px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+
+/* Logo */
+.logo-mark{background:linear-gradient(135deg,var(--accent-dark),var(--accent2));border-radius:12px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;color:#fff;letter-spacing:-.5px;flex-shrink:0}
+
+/* Session timer */
+.timer-ring{width:80px;height:80px}
+
+/* Stat card */
+.stat-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:1rem}
+
+/* Spinner */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{animation:spin 1s linear infinite;border:2px solid rgba(255,255,255,.1);border-top-color:var(--accent);border-radius:50%;width:20px;height:20px;display:inline-block}
+
+/* Grade ring */
+.grade-ring-wrap{position:relative;width:100px;height:100px;margin:0 auto}
+.grade-ring-wrap svg{transform:rotate(-90deg)}
+.grade-ring-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+
+/* Percent ring */
+.percent-ring-wrap{position:relative;width:100px;height:100px;margin:0 auto}
+.percent-ring-wrap svg{transform:rotate(-90deg)}
+.percent-ring-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+
+/* Nav */
+nav{background:rgba(10,10,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:40}
+
+/* Fade-in */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .4s ease forwards}
+
+/* Pulse */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 2s infinite}
+</style>
 </head>
-<body class="min-h-screen">
+<body>
 
-<!-- ═══════════════════════════════════════════════════════
-     LICENSE GATE
-══════════════════════════════════════════════════════════ -->
-<div id="license-screen" class="license-screen">
-  <div class="license-glow"></div>
-  <div class="glass rounded-3xl w-full max-w-md p-8 text-center z-10 fade-in">
-    <div class="w-14 h-14 rounded-2xl gradient-btn flex items-center justify-center text-white font-black text-xl mx-auto mb-5">SG</div>
-    <h1 class="font-display text-2xl font-bold gradient-text mb-1">Study Grade Predictor</h1>
-    <p class="text-slate-500 text-sm mb-8">by <span class="text-violet-400 font-semibold">nague</span></p>
-
-    <div class="mb-6">
-      <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 block">Clé de licence</label>
-      <input type="text" id="license-input" maxlength="35" placeholder="XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX"
-        class="w-full px-4 py-3.5 text-sm" oninput="formatLicenseInput(this)" onkeydown="if(event.key==='Enter')activateLicense()"/>
-      <p id="license-error" class="text-red-400 text-xs mt-2 hidden">Clé invalide. Vérifiez votre email Gumroad.</p>
+<!-- ═══════════════════════════════════════════════════════ LICENSE SCREEN -->
+<div id="license-screen" style="display:flex" class="min-h-screen flex-col items-center justify-center px-4 py-12">
+  <div class="glass-card p-8 w-full max-w-md text-center space-y-6">
+    <div class="flex flex-col items-center gap-3">
+      <div class="logo-mark text-xl">SG</div>
+      <h1 class="text-2xl font-bold gradient-text">Study Grade Predictor</h1>
+      <p class="text-slate-400 text-sm">by nague</p>
     </div>
 
-    <button onclick="activateLicense()" class="gradient-btn w-full py-3.5 rounded-xl text-white font-semibold mb-4">
-      Activer l'accès
+    <div class="space-y-3 text-left">
+      <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">License key</label>
+      <input id="license-input" class="inp text-center tracking-widest" type="text" maxlength="35"
+        placeholder="XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX"
+        oninput="this.value=this.value.toUpperCase()"/>
+      <button onclick="activateLicense()" class="gradient-btn w-full py-3 rounded-xl font-semibold text-sm">
+        Activate access
+      </button>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <div class="flex-1 h-px bg-white/10"></div>
+      <span class="text-xs text-slate-500">or</span>
+      <div class="flex-1 h-px bg-white/10"></div>
+    </div>
+
+    <button onclick="startTrial()" class="w-full py-3 rounded-xl font-semibold text-sm border border-white/15 text-slate-300 hover:bg-white/5 transition-colors">
+      Start 7-day free trial
     </button>
 
-    <div class="flex items-center gap-3 my-5">
-      <div class="flex-1 h-px bg-white/8"></div>
-      <span class="text-slate-600 text-xs">Pas encore client ?</span>
-      <div class="flex-1 h-px bg-white/8"></div>
-    </div>
-
-    <a href="index.html" class="block py-3 rounded-xl border border-white/10 text-slate-400 text-sm hover:text-white hover:border-violet-500/40 transition">
-      Voir la page de vente — 5€
+    <a href="index.html" class="block text-xs text-slate-500 hover:text-slate-300 transition-colors">
+      See sales page — <span class="font-semibold">€5</span>
     </a>
-
-    <p class="text-slate-700 text-xs mt-5">La clé vous a été envoyée par email après votre achat sur Gumroad.</p>
+    <p class="text-xs text-slate-600">Key sent by email after purchase on Gumroad</p>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     MAIN APP (hidden until licensed)
-══════════════════════════════════════════════════════════ -->
-<div id="main-app" class="flex flex-col min-h-screen hidden">
-
-  <!-- NAVBAR -->
-  <nav class="glass sticky top-0 z-40 px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-    <div class="flex items-center gap-2.5 shrink-0">
-      <a href="index.html" class="w-8 h-8 rounded-lg gradient-btn flex items-center justify-center text-white font-black text-xs">SG</a>
-      <span class="font-display text-lg gradient-text hidden sm:block">Study Grade Predictor</span>
+<!-- ═══════════════════════════════════════════════════════ LOCKED SCREEN -->
+<div id="locked-screen" style="display:none" class="min-h-screen flex-col items-center justify-center px-4 py-12">
+  <div class="glass-card p-8 w-full max-w-md text-center space-y-6">
+    <div class="flex flex-col items-center gap-3">
+      <div class="logo-mark text-xl">SG</div>
+      <div class="w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto text-2xl">⏰</div>
+      <h1 class="text-2xl font-bold text-white">Your free trial has ended</h1>
+      <p class="text-slate-400 text-sm">Get full access for just <strong class="text-white">€5</strong> — one-time payment, lifetime access.</p>
     </div>
-    <div class="flex items-center gap-2">
-      <div class="flex gap-1 p-1 glass rounded-lg">
-        <button onclick="setLang('fr')" data-lang="fr" class="lang-btn px-2.5 py-1 rounded-md text-xs font-semibold text-slate-400 border border-transparent">FR</button>
-        <button onclick="setLang('en')" data-lang="en" class="lang-btn px-2.5 py-1 rounded-md text-xs font-semibold text-slate-400 border border-transparent">EN</button>
-        <button onclick="setLang('de')" data-lang="de" class="lang-btn px-2.5 py-1 rounded-md text-xs font-semibold text-slate-400 border border-transparent">DE</button>
+
+    <a href="https://nague.gumroad.com/l/nagDev" target="_blank"
+      class="gradient-btn block w-full py-4 rounded-xl font-bold text-base">
+      Buy now — €5
+    </a>
+
+    <div class="flex items-center gap-3">
+      <div class="flex-1 h-px bg-white/10"></div>
+      <span class="text-xs text-slate-500">Already purchased?</span>
+      <div class="flex-1 h-px bg-white/10"></div>
+    </div>
+
+    <div class="space-y-3 text-left">
+      <input id="locked-license-input" class="inp text-center tracking-widest" type="text" maxlength="35"
+        placeholder="XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX"
+        oninput="this.value=this.value.toUpperCase()"/>
+      <button onclick="activateLockedLicense()" class="w-full py-3 rounded-xl font-semibold text-sm border border-white/15 text-slate-300 hover:bg-white/5 transition-colors">
+        Activate my license
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ ROLE SCREEN -->
+<div id="role-screen" style="display:none" class="min-h-screen flex-col items-center justify-center px-4 py-12">
+  <div class="text-center space-y-2 mb-8">
+    <div class="logo-mark text-xl mx-auto">SG</div>
+    <h1 class="text-3xl font-bold text-white mt-4">Choose your profile</h1>
+    <p class="text-slate-400">The app adapts to your workflow</p>
+  </div>
+  <div id="role-cards-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 w-full max-w-3xl">
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ MAIN APP -->
+<div id="main-app" class="hidden min-h-screen flex flex-col">
+
+  <!-- Trial banner -->
+  <div id="trial-banner" class="hidden text-center text-xs py-1.5 px-4"
+    style="background:rgba(245,158,11,.1);border-bottom:1px solid rgba(245,158,11,.2);color:#fcd34d">
+    ⏳ Free trial — <span id="trial-days-left"></span> days remaining ·
+    <a href="https://nague.gumroad.com/l/nagDev" target="_blank" class="underline font-semibold">Buy for €5 →</a>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="px-4 py-3">
+    <div class="max-w-6xl mx-auto flex items-center gap-3">
+      <a href="index.html" class="logo-mark text-sm flex-shrink-0">SG</a>
+      <span class="hidden sm:block font-semibold text-sm text-slate-300">Study Grade Predictor</span>
+
+      <!-- Role indicator -->
+      <button onclick="openRoleScreen()"
+        class="ml-1 flex items-center gap-1.5 px-3 py-1.5 rounded-lg glass text-xs font-medium text-slate-300 hover:bg-white/5 transition-colors">
+        <span id="nav-role-icon" class="text-sm"></span>
+        <span id="nav-role-name" class="hidden sm:inline"></span>
+        <svg class="w-3 h-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+      </button>
+
+      <div class="flex-1"></div>
+
+      <!-- Lang switcher -->
+      <div class="flex gap-1">
+        <button onclick="setLang('fr')" id="lang-fr" class="px-2 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white transition-colors">FR</button>
+        <button onclick="setLang('en')" id="lang-en" class="px-2 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white transition-colors">EN</button>
+        <button onclick="setLang('de')" id="lang-de" class="px-2 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white transition-colors">DE</button>
       </div>
-      <span id="nav-date" class="text-slate-500 text-xs hidden xl:block"></span>
-      <button onclick="openAddSubject()" id="btn-add-subject" class="gradient-btn text-white text-sm px-3 py-2 rounded-lg font-medium whitespace-nowrap">+</button>
+
+      <!-- Date -->
+      <span id="nav-date" class="hidden md:block text-xs text-slate-500"></span>
+
+      <!-- Add button -->
+      <button id="btn-add-subject" onclick="openAddModal()"
+        class="gradient-btn px-4 py-2 rounded-xl font-semibold text-xs flex items-center gap-1.5">
+        <span class="text-lg leading-none">+</span>
+        <span id="btn-add-label">Add</span>
+      </button>
     </div>
   </nav>
 
-  <!-- MAIN -->
-  <main class="flex-1 p-3 sm:p-6 max-w-7xl mx-auto w-full">
+  <!-- Tabs -->
+  <div class="px-4 pt-4">
+    <div class="max-w-6xl mx-auto flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+      <button id="tab-0" onclick="setTab(0)" class="tab-btn flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium border border-white/10 text-slate-400 hover:text-slate-200 transition-all">Dashboard</button>
+      <button id="tab-1" onclick="setTab(1)" class="tab-btn flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium border border-white/10 text-slate-400 hover:text-slate-200 transition-all">Items</button>
+      <button id="tab-2" onclick="setTab(2)" class="tab-btn flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium border border-white/10 text-slate-400 hover:text-slate-200 transition-all">Analytics</button>
+      <button id="tab-3" onclick="setTab(3)" class="tab-btn flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium border border-white/10 text-slate-400 hover:text-slate-200 transition-all">Predictions</button>
+    </div>
+  </div>
 
-    <div id="hero-stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5"></div>
+  <!-- Content -->
+  <div class="flex-1 px-4 pb-8 pt-4">
+    <div class="max-w-6xl mx-auto">
 
-    <div class="glass rounded-xl mb-5 overflow-hidden">
-      <div class="flex border-b border-white/5 overflow-x-auto">
-        <button onclick="setTab('dashboard')" class="tab-btn px-4 py-3 text-sm font-medium text-slate-400 transition-all whitespace-nowrap" data-tab="dashboard"></button>
-        <button onclick="setTab('subjects')" class="tab-btn px-4 py-3 text-sm font-medium text-slate-400 transition-all whitespace-nowrap" data-tab="subjects"></button>
-        <button onclick="setTab('analytics')" class="tab-btn px-4 py-3 text-sm font-medium text-slate-400 transition-all whitespace-nowrap" data-tab="analytics"></button>
-        <button onclick="setTab('predictions')" class="tab-btn px-4 py-3 text-sm font-medium text-slate-400 transition-all whitespace-nowrap" data-tab="predictions"></button>
-      </div>
-
-      <!-- DASHBOARD -->
-      <div id="tab-dashboard" class="tab-content p-4 sm:p-5 fade-in">
-        <div class="grid md:grid-cols-2 gap-5">
-          <div>
-            <h2 id="lbl-active-session" class="text-base font-semibold mb-3 text-slate-200"></h2>
-            <div id="active-session-panel" class="glass rounded-xl p-5 min-h-[160px] flex flex-col justify-center items-center text-center">
-              <div id="lbl-no-session" class="text-slate-500 text-sm"></div>
-              <div id="lbl-select-hint" class="text-slate-600 text-xs mt-1"></div>
-            </div>
+      <!-- TAB 0: DASHBOARD -->
+      <div id="content-0" class="hidden space-y-6">
+        <!-- Active session panel -->
+        <div id="active-session-panel" class="hidden glass-card p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-semibold text-white" data-t="activeSession">Active session</span>
+            <span id="session-timer" class="font-mono text-2xl font-bold gradient-text">00:00:00</span>
           </div>
-          <div>
-            <h2 id="lbl-start-session" class="text-base font-semibold mb-3 text-slate-200"></h2>
-            <div class="glass rounded-xl p-4 space-y-3">
-              <select id="session-subject" class="w-full px-3 py-2 text-sm"></select>
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label id="lbl-mode" class="text-xs text-slate-500 mb-1 block"></label>
-                  <select id="session-mode" class="w-full px-3 py-2 text-sm"></select>
-                </div>
-                <div>
-                  <label id="lbl-goal" class="text-xs text-slate-500 mb-1 block"></label>
-                  <input type="number" id="session-goal" value="60" min="5" max="480" class="w-full px-3 py-2 text-sm"/>
-                </div>
-              </div>
-              <button onclick="startSession()" id="btn-start-session" class="gradient-btn w-full py-2.5 rounded-lg text-white text-sm font-medium"></button>
+          <div class="flex items-center justify-between">
+            <div>
+              <p id="session-subject-name" class="text-sm font-medium text-slate-200"></p>
+              <p id="session-mode-display" class="text-xs text-slate-500 mt-0.5"></p>
             </div>
+            <button onclick="stopSession()" class="px-4 py-2 rounded-xl text-sm font-semibold bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/25 transition-colors">
+              Stop
+            </button>
           </div>
         </div>
-        <div class="mt-5">
-          <h2 id="lbl-recent" class="text-base font-semibold mb-3 text-slate-200"></h2>
-          <div id="recent-sessions" class="space-y-2"></div>
+        <p id="no-active-session" class="text-xs text-slate-600 text-center" data-t="noSession">No active session</p>
+
+        <!-- Stats row -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="stat-card">
+            <p class="text-xs text-slate-500 mb-1" data-t="stats0">Total items</p>
+            <p id="stat-total" class="text-2xl font-bold text-white">0</p>
+          </div>
+          <div class="stat-card">
+            <p class="text-xs text-slate-500 mb-1" data-t="stats1">Sessions today</p>
+            <p id="stat-today" class="text-2xl font-bold gradient-text">0</p>
+          </div>
+          <div class="stat-card">
+            <p class="text-xs text-slate-500 mb-1" data-t="stats2">Hours this week</p>
+            <p id="stat-week" class="text-2xl font-bold text-white">0h</p>
+          </div>
+          <div class="stat-card">
+            <p class="text-xs text-slate-500 mb-1" data-t="stats3">Avg score</p>
+            <p id="stat-avg" class="text-2xl font-bold gradient-text">—</p>
+          </div>
+        </div>
+
+        <!-- Recent sessions -->
+        <div class="glass-card p-5">
+          <h3 class="font-semibold text-sm text-slate-300 mb-3" data-t="recent">Recent sessions</h3>
+          <div id="recent-sessions-list" class="space-y-2"></div>
+          <p id="no-sessions-msg" class="text-xs text-slate-600 text-center py-4" data-t="noSessions">No sessions yet</p>
         </div>
       </div>
 
-      <!-- SUBJECTS -->
-      <div id="tab-subjects" class="tab-content p-4 sm:p-5 fade-in hidden">
-        <div id="subjects-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-        <div id="subjects-empty" class="text-center py-16 hidden">
-          <div class="text-5xl mb-4">📚</div>
-          <div id="lbl-no-subjects" class="text-slate-400 font-medium"></div>
-          <div id="lbl-add-hint" class="text-slate-600 text-sm mt-1"></div>
-          <button onclick="openAddSubject()" id="btn-add-first" class="gradient-btn mt-4 px-6 py-2.5 rounded-lg text-white text-sm font-medium"></button>
+      <!-- TAB 1: SUBJECTS/ITEMS -->
+      <div id="content-1" class="hidden space-y-4">
+        <div id="subjects-list" class="space-y-3"></div>
+        <div id="no-subjects-msg" class="hidden text-center py-16 space-y-3">
+          <div class="text-5xl">📋</div>
+          <p id="lbl-no-subjects" class="text-slate-400 font-medium"></p>
+          <p id="lbl-add-hint" class="text-slate-600 text-sm"></p>
+          <button id="btn-add-first" onclick="openAddModal()" class="gradient-btn px-6 py-3 rounded-xl font-semibold text-sm mt-2"></button>
         </div>
       </div>
 
-      <!-- ANALYTICS -->
-      <div id="tab-analytics" class="tab-content p-4 sm:p-5 fade-in hidden">
-        <div class="grid md:grid-cols-2 gap-5 mb-5">
-          <div class="glass rounded-xl p-4">
-            <h3 id="lbl-chart-time" class="text-sm font-semibold text-slate-300 mb-3"></h3>
+      <!-- TAB 2: ANALYTICS -->
+      <div id="content-2" class="hidden space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div class="glass-card p-5">
+            <h3 class="font-semibold text-sm text-slate-300 mb-4" data-t="chartTime">Time per item (h)</h3>
             <canvas id="chart-time" height="220"></canvas>
           </div>
-          <div class="glass rounded-xl p-4">
-            <h3 id="lbl-chart-grade" class="text-sm font-semibold text-slate-300 mb-3"></h3>
-            <canvas id="chart-progress" height="220"></canvas>
+          <div class="glass-card p-5">
+            <h3 class="font-semibold text-sm text-slate-300 mb-4" data-t="chartWeekly">Weekly activity (h)</h3>
+            <canvas id="chart-weekly" height="220"></canvas>
           </div>
         </div>
-        <div class="glass rounded-xl p-4">
-          <h3 id="lbl-chart-weekly" class="text-sm font-semibold text-slate-300 mb-3"></h3>
-          <canvas id="chart-weekly" height="120"></canvas>
+        <div class="glass-card p-5">
+          <h3 id="lbl-chart-grade" class="font-semibold text-sm text-slate-300 mb-4"></h3>
+          <canvas id="chart-progress" height="180"></canvas>
         </div>
       </div>
 
-      <!-- PREDICTIONS -->
-      <div id="tab-predictions" class="tab-content p-4 sm:p-5 fade-in hidden">
-        <div id="predictions-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-        <div id="predictions-empty" class="text-center py-16 hidden">
-          <div class="text-5xl mb-4">🔮</div>
-          <div id="lbl-no-pred" class="text-slate-400 font-medium"></div>
-          <div id="lbl-no-pred-hint" class="text-slate-600 text-sm mt-1"></div>
+      <!-- TAB 3: PREDICTIONS -->
+      <div id="content-3" class="hidden">
+        <div id="predictions-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        <div id="no-pred-msg" class="hidden text-center py-16 space-y-2">
+          <div class="text-5xl">🔮</div>
+          <p class="text-slate-400" data-t="noPred">No predictions yet</p>
+          <p class="text-slate-600 text-sm" data-t="noPredHint">Add items and sessions to see predictions</p>
         </div>
       </div>
+
     </div>
-  </main>
+  </div>
 
-  <!-- FOOTER -->
-  <footer class="glass border-t border-white/5 py-3 px-4 text-center">
-    <span class="text-slate-700 text-xs">Study Grade Predictor · by <span class="text-violet-500">nague</span> · <a href="index.html" class="hover:text-slate-500 transition">studygradepredictor.netlify.app</a></span>
+  <!-- Footer -->
+  <footer class="text-center text-xs text-slate-700 py-4 border-t border-white/5">
+    Study Grade Predictor · by nague
   </footer>
 </div>
 
-<!-- MODAL: ADD SUBJECT -->
-<div id="modal-subject" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
-  <div class="glass rounded-2xl w-full max-w-lg p-6 fade-in max-h-[90vh] overflow-y-auto">
-    <div class="flex items-center justify-between mb-5">
-      <h2 id="modal-sub-title" class="text-xl font-semibold gradient-text"></h2>
-      <button onclick="closeModal('modal-subject')" class="text-slate-500 hover:text-slate-300 text-2xl leading-none">&times;</button>
+<!-- ═══════════════════════════════════════════════════════ ADD MODAL -->
+<div id="add-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-6">
+      <h2 id="modal-sub-title" class="font-bold text-lg text-white"></h2>
+      <button onclick="closeModal('add-modal')" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:text-white transition-colors">✕</button>
     </div>
-    <div class="space-y-4">
-      <div><label id="lbl-sub-name" class="text-xs font-medium text-slate-400 mb-1 block"></label>
-        <input type="text" id="sub-name" class="w-full px-3 py-2.5 text-sm"/></div>
-      <div class="grid grid-cols-2 gap-3">
-        <div><label id="lbl-sub-cat" class="text-xs font-medium text-slate-400 mb-1 block"></label>
-          <select id="sub-category" class="w-full px-3 py-2.5 text-sm"></select></div>
-        <div><label id="lbl-sub-diff" class="text-xs font-medium text-slate-400 mb-1 block"></label>
-          <select id="sub-difficulty" class="w-full px-3 py-2.5 text-sm"></select></div>
-      </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div><label id="lbl-sub-hours" class="text-xs font-medium text-slate-400 mb-1 block"></label>
-          <input type="number" id="sub-target-hours" value="80" min="1" max="500" class="w-full px-3 py-2.5 text-sm"/></div>
-        <div><label id="lbl-sub-exam" class="text-xs font-medium text-slate-400 mb-1 block"></label>
-          <input type="date" id="sub-exam-date" class="w-full px-3 py-2.5 text-sm"/></div>
-      </div>
-      <div class="glass rounded-xl p-3"><div id="lbl-grade-info" class="text-xs text-slate-500 leading-relaxed"></div></div>
-      <div><label id="lbl-sub-desc" class="text-xs font-medium text-slate-400 mb-1 block"></label>
-        <textarea id="sub-desc" rows="2" class="w-full px-3 py-2.5 text-sm resize-none"></textarea></div>
-    </div>
-    <div class="flex gap-3 mt-5">
-      <button onclick="closeModal('modal-subject')" id="btn-cancel-sub" class="flex-1 py-2.5 rounded-lg border border-white/10 text-slate-400 text-sm hover:text-white transition"></button>
-      <button onclick="saveSubject()" id="btn-save-sub" class="flex-1 gradient-btn py-2.5 rounded-lg text-white text-sm font-medium"></button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: SUBJECT DETAIL -->
-<div id="modal-detail" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
-  <div class="glass rounded-2xl w-full max-w-2xl p-6 fade-in max-h-[90vh] overflow-y-auto">
-    <div class="flex items-center justify-between mb-5">
-      <h2 id="detail-title" class="text-xl font-semibold gradient-text"></h2>
-      <button onclick="closeModal('modal-detail')" class="text-slate-500 hover:text-slate-300 text-2xl leading-none">&times;</button>
-    </div>
-    <div id="detail-content"></div>
-  </div>
-</div>
-
-<!-- MODAL: LOG SCORE -->
-<div id="modal-score" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
-  <div class="glass rounded-2xl w-full max-w-md p-6 fade-in">
-    <div class="flex items-center justify-between mb-5">
-      <h2 id="modal-score-title" class="text-xl font-semibold gradient-text"></h2>
-      <button onclick="closeModal('modal-score')" class="text-slate-500 hover:text-slate-300 text-2xl leading-none">&times;</button>
-    </div>
-    <div class="space-y-4">
-      <input type="hidden" id="score-subject-id"/>
-      <div><label id="lbl-score-type" class="text-xs font-medium text-slate-400 mb-2 block"></label>
-        <select id="score-type" class="w-full px-3 py-2.5 text-sm"></select></div>
+    <form onsubmit="saveSubject(event)" class="space-y-4">
       <div>
-        <label id="lbl-score-val" class="text-xs font-medium text-slate-400 mb-2 block"></label>
-        <input type="range" id="score-value" min="0" max="100" value="70"
-          oninput="document.getElementById('score-display').textContent=this.value+'%'" class="w-full accent-violet-500"/>
-        <div class="flex justify-between text-xs text-slate-500 mt-1">
-          <span>0%</span><span id="score-display" class="text-violet-400 font-medium">70%</span><span>100%</span>
+        <label id="lbl-sub-name" class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5"></label>
+        <input id="sub-name" class="inp" type="text" required/>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5" data-t="category">Category</label>
+          <select id="sub-category" class="inp"></select>
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5" data-t="difficulty">Difficulty</label>
+          <select id="sub-difficulty" class="inp"></select>
         </div>
       </div>
-      <div><label id="lbl-score-comment" class="text-xs font-medium text-slate-400 mb-1 block"></label>
-        <textarea id="score-comment" rows="2" class="w-full px-3 py-2.5 text-sm resize-none"></textarea></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label id="lbl-sub-exam" class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5"></label>
+          <input id="sub-exam" class="inp" type="date"/>
+        </div>
+        <div>
+          <label id="lbl-sub-hours" class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5"></label>
+          <input id="sub-hours" class="inp" type="number" min="0" step="0.5" value="40"/>
+        </div>
+      </div>
+      <div>
+        <label id="lbl-grade-info" class="text-xs text-slate-600 block"></label>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="closeModal('add-modal')" class="flex-1 py-3 rounded-xl font-semibold text-sm border border-white/10 text-slate-400 hover:bg-white/5 transition-colors" data-t="cancel">Cancel</button>
+        <button type="submit" class="gradient-btn flex-1 py-3 rounded-xl font-semibold text-sm" data-t="save">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ DETAIL MODAL -->
+<div id="detail-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h2 id="detail-title" class="font-bold text-lg text-white"></h2>
+      <button onclick="closeModal('detail-modal')" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:text-white transition-colors">✕</button>
     </div>
-    <div class="flex gap-3 mt-5">
-      <button onclick="closeModal('modal-score')" id="btn-cancel-score" class="flex-1 py-2.5 rounded-lg border border-white/10 text-slate-400 text-sm hover:text-white transition"></button>
-      <button onclick="saveScore()" id="btn-save-score" class="flex-1 gradient-btn py-2.5 rounded-lg text-white text-sm font-medium"></button>
+    <!-- Progress -->
+    <div class="mb-5">
+      <div class="flex justify-between text-xs text-slate-500 mb-1.5">
+        <span data-t="progress">Progress</span>
+        <span id="detail-pct"></span>
+      </div>
+      <div class="h-2 rounded-full bg-white/5 overflow-hidden">
+        <div id="detail-progress-bar" class="progress-bar h-2"></div>
+      </div>
+    </div>
+    <!-- Stats row -->
+    <div class="grid grid-cols-3 gap-3 mb-5">
+      <div class="stat-card text-center">
+        <p class="text-xs text-slate-500 mb-1" data-t="time">Time</p>
+        <p id="detail-time" class="text-lg font-bold text-white"></p>
+      </div>
+      <div class="stat-card text-center">
+        <p class="text-xs text-slate-500 mb-1" data-t="avgScore">Avg score</p>
+        <p id="detail-avg" class="text-lg font-bold gradient-text"></p>
+      </div>
+      <div class="stat-card text-center">
+        <p class="text-xs text-slate-500 mb-1" data-t="sessions">Sessions</p>
+        <p id="detail-sessions" class="text-lg font-bold text-white"></p>
+      </div>
+    </div>
+    <!-- Session starter -->
+    <div class="glass-card p-4 mb-5 space-y-3">
+      <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider" data-t="startSess">Start a session</p>
+      <select id="session-mode" class="inp text-sm"></select>
+      <div>
+        <label class="text-xs text-slate-500 block mb-1" data-t="goalLabel">Goal (minutes)</label>
+        <input id="session-goal" class="inp text-sm" type="number" min="5" step="5" value="30"/>
+      </div>
+      <button onclick="startSession()" class="gradient-btn w-full py-2.5 rounded-xl font-semibold text-sm" data-t="startSession">Start</button>
+    </div>
+    <!-- Results -->
+    <div class="mb-4">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider" data-t="results">Results</p>
+        <button onclick="openScoreModal()" class="text-xs font-semibold px-3 py-1.5 rounded-lg gradient-btn" data-t="addResultBtn">+ Score</button>
+      </div>
+      <div id="detail-scores-list" class="space-y-2"></div>
+    </div>
+    <!-- Footer buttons -->
+    <div class="flex gap-2 pt-3 border-t border-white/5">
+      <button onclick="deleteSubject()" class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors" data-t="delete">Delete</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="fixed bottom-5 right-4 z-50 hidden">
-  <div id="toast-inner" class="glass px-5 py-3 rounded-xl text-sm font-medium text-emerald-400 border border-emerald-500/20 fade-in"></div>
+<!-- ═══════════════════════════════════════════════════════ SCORE MODAL -->
+<div id="score-modal" class="modal-overlay hidden">
+  <div class="modal-box max-w-sm">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="font-bold text-base text-white" data-t="addResult">Add a score</h2>
+      <button onclick="closeModal('score-modal')" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:text-white transition-colors">✕</button>
+    </div>
+    <form onsubmit="saveScore(event)" class="space-y-4">
+      <div>
+        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5" data-t="scoreType">Type</label>
+        <select id="score-type" class="inp"></select>
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5" data-t="scoreVal">Score (0–100)</label>
+        <input id="score-val" class="inp" type="number" min="0" max="100" step="0.5" required/>
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5" data-t="scoreComment">Comment</label>
+        <input id="score-comment" class="inp" type="text" id="score-comment-inp"/>
+      </div>
+      <div class="flex gap-3">
+        <button type="button" onclick="closeModal('score-modal')" class="flex-1 py-3 rounded-xl font-semibold text-sm border border-white/10 text-slate-400 hover:bg-white/5 transition-colors" data-t="cancel">Cancel</button>
+        <button type="submit" class="gradient-btn flex-1 py-3 rounded-xl font-semibold text-sm" data-t="save">Save</button>
+      </div>
+    </form>
+  </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ STOP MODAL -->
+<div id="stop-modal" class="modal-overlay hidden">
+  <div class="modal-box max-w-sm">
+    <h2 class="font-bold text-base text-white mb-4" data-t="stop">End session</h2>
+    <p class="text-sm text-slate-400 mb-5" data-t="stopScore">Rate this session (0–100)</p>
+    <input id="stop-score" class="inp mb-5" type="number" min="0" max="100" step="1" value="70"/>
+    <div class="flex gap-3">
+      <button onclick="closeModal('stop-modal')" class="flex-1 py-3 rounded-xl font-semibold text-sm border border-white/10 text-slate-400 hover:bg-white/5 transition-colors" data-t="cancel">Cancel</button>
+      <button onclick="confirmStop()" class="gradient-btn flex-1 py-3 rounded-xl font-semibold text-sm" data-t="save">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- ═══════════════════════════════════════════════════════ SCRIPTS -->
 <script>
-// ═══════════════════════════════════════════════════════
-// LICENSE SYSTEM
-// ═══════════════════════════════════════════════════════
-const LICENSE_SALT = 'nague_sgp_2025_x7k';
+// ─────────────────── CONSTANTS ───────────────────
+const TRIAL_DAYS = 7;
+const GUMROAD_URL = 'https://nague.gumroad.com/l/nagDev';
+const VALID_GRADES = [1.0,1.3,1.7,2.0,2.3,2.7,3.0,3.3,3.7,4.0];
+const PASS_GRADES  = [1.0,1.3,1.7,2.0,2.3,2.7,3.0,3.3];
 
-function fnv32(str) {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i);
-    h = Math.imul(h, 0x01000193) >>> 0;
-  }
-  return h.toString(16).toUpperCase().padStart(8, '0');
-}
-
-function validateKey(raw) {
-  // Accept Gumroad format: XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX (32 hex chars + 3 dashes)
-  const key = raw.trim().toUpperCase();
-  const gumroadPattern = /^[0-9A-F]{8}-[0-9A-F]{8}-[0-9A-F]{8}-[0-9A-F]{8}$/;
-  return gumroadPattern.test(key);
-}
-
-function formatLicenseInput(el) {
-  // Allow hex characters and dashes, auto-uppercase
-  let v = el.value.toUpperCase().replace(/[^A-F0-9-]/g, '');
-  // Remove all dashes then re-insert at correct positions
-  const hex = v.replace(/-/g, '').slice(0, 32);
-  const parts = [hex.slice(0,8), hex.slice(8,16), hex.slice(16,24), hex.slice(24,32)].filter(Boolean);
-  el.value = parts.join('-');
-  document.getElementById('license-error').classList.add('hidden');
-}
-
-function activateLicense() {
-  const raw = document.getElementById('license-input').value;
-  if (validateKey(raw)) {
-    localStorage.setItem('sgp_license', raw.toUpperCase());
-    document.getElementById('license-screen').style.display = 'none';
-    document.getElementById('main-app').classList.remove('hidden');
-    initApp();
-    toast('✓ Licence activée — Bienvenue !', 'emerald');
-  } else {
-    const errEl = document.getElementById('license-error');
-    errEl.classList.remove('hidden');
-    const inp = document.getElementById('license-input');
-    inp.classList.add('shake');
-    setTimeout(() => inp.classList.remove('shake'), 500);
-  }
-}
-
-function checkLicense() {
-  const stored = localStorage.getItem('sgp_license');
-  if (stored && validateKey(stored)) {
-    document.getElementById('license-screen').style.display = 'none';
-    document.getElementById('main-app').classList.remove('hidden');
-    return true;
-  }
-  return false;
-}
-
-// ═══════════════════════════════════════════════════════
-// TRANSLATIONS
-// ═══════════════════════════════════════════════════════
-const T = {
+// ─────────────────── ROLES TRANSLATIONS ───────────────────
+const ROLES_T = {
   fr: {
-    btnAddSubject:'+ Matière',
-    tabs:['Tableau de bord','Matières','Analytique','Prédictions'],
-    stats:['Matières suivies','Temps total','Score moyen',"Aujourd'hui"],
-    activeSession:'Session active',noSession:'Aucune session en cours',
-    selectHint:'Sélectionnez une matière pour démarrer',
-    startSession:'Démarrer une session',modeLabel:'Mode',goalLabel:'Objectif (min)',
-    btnStart:'Démarrer la session',recent:'Sessions récentes',
-    noSessions:'Aucune session enregistrée',noSubjects:'Aucune matière',
-    addHint:'Ajoutez votre première matière pour commencer',btnAddFirst:'+ Ajouter une matière',
-    chartTime:"Temps d'étude par matière",chartGrade:'Note prédite par matière',
-    chartWeekly:'Activité hebdomadaire (7 derniers jours)',
-    noPred:'Aucune prédiction disponible',noPredHint:'Ajoutez des matières et des sessions pour voir vos prédictions',
-    modalSubTitle:'Nouvelle matière',subName:'Nom de la matière *',subNamePh:'ex : Mathématiques, Droit civil…',
-    subCat:'Catégorie',subDiff:'Difficulté perçue',subHours:'Heures cible totales',
-    subExam:"Date de l'examen",subDesc:'Description / objectifs',subDescPh:'Chapitres couverts, objectifs…',
-    gradeInfo:'⚖️ Barème : 1,0 = meilleure note · 4,0 = seuil de validation · > 4,0 = échec',
-    cancel:'Annuler',create:'Créer la matière',
-    scoreTitle:'Enregistrer un résultat',scoreType:"Type d'évaluation",
-    scoreVal:'Score obtenu (%)',scoreComment:'Commentaire',scoreCommentPh:'Notes sur cette évaluation…',
-    save:'Enregistrer',
-    modes:['Étude','Pratique','Révision','Simulation examen'],
-    modeKeys:['study','practice','review','exam'],
-    scoreTypes:['Quiz / contrôle','Exercices','Examen blanc','Auto-évaluation'],
-    scoreTypeKeys:['quiz','exercise','mock_exam','self_eval'],
-    cats:['Sciences','Droit','Économie','Lettres','Informatique','Médecine','Ingénierie','Autre'],
-    diffs:['Facile','Modérée','Difficile','Très difficile'],
-    progress:'Progression',time:'temps',avgScore:'score moy.',chance:'chance',
-    info:'Informations',category:'Catégorie',difficulty:'Difficulté',targetH:'Heures cible',
-    passGrade:'Seuil de validation',exam:'Examen',predTitle:'Prédiction actuelle',
-    predGrade:'Note prédite',predChance:'Chance de réussite',predVerdict:'Verdict',predConf:'Confiance modèle',
-    progressLabel:'Progression globale',results:'Résultats',sessions:'Sessions',
-    delete:'Supprimer',addResult:'+ Résultat',startSess:'Démarrer session',
-    willPass:'✓ Validation probable',willFail:"✗ Risque d'échec",
-    verdictOk:'✓ Probable',verdictKo:'✗ Risqué',
-    confHigh:'haute',confMed:'moyenne',confLow:'faible',confLowHint:' — ajoutez des sessions pour affiner',
-    addResultBtn:'+ Ajouter un résultat',timeCov:'Couverture temporelle',
-    scoreFac:'Score moyen',consist:'Régularité',confidence:'Confiance',
-    daysLeft:'j avant examen',deletedSub:'Matière supprimée',
-    deleteConfirm:'Supprimer cette matière et toutes ses données ?',
-    sessionRunning:'Une session est déjà en cours',chooseSubject:'Choisissez une matière',
-    toastAdded:'ajoutée ✓',toastStarted:'Session démarrée — bonne étude ! 🚀',
-    toastSaved:'Session enregistrée ✓',toastScore:'Résultat enregistré ✓',
-    toastDeleted:'Matière supprimée',toastEnterName:'Entrez un nom de matière',
-    objective:'Objectif',remaining:'Restant',stop:'Terminer',stopScore:'Terminer + score',
-    gradeLabel:['Très bien','Très bien','Bien','Bien','Bien','Assez bien','Assez bien','Suffisant','Suffisant','Suffisant'],
-    predictedGrade:'Note prédite',hours:'Heures',chooseSubPh:'-- Choisir une matière --',
-    passThreshold:'≤ 4,0 pour valider',
+    student: {
+      name:'Étudiant', desc:'Cours, préparation aux examens, prédiction de note',
+      itemLabel:'Matière', itemsTab:'Matières', addBtn:'Ajouter une matière', addModal:'Nouvelle matière',
+      itemNameLabel:'Nom de la matière', itemNamePh:'ex: Mathématiques, Droit...',
+      deadlineLabel:'Date examen', deadlineLbl:'Examen',
+      targetLabel:'Objectif heures', predLabel:'Note prédite',
+      predInfoLabel:'La prédiction utilise vos sessions et scores pour estimer votre note finale.',
+      noItems:'Aucune matière ajoutée', addHint:'Ajoutez votre première matière pour commencer',
+      addFirst:'Ajouter une matière', passLabel:'Note de passage', passThreshold:10,
+      chartGradeLabel:'Progression des notes', predType:'grade',
+      modes:['Étude','Pratique','Révision','Simulation examen'], modeKeys:['study','practice','review','exam'],
+      scoreTypes:['Quiz / contrôle','Exercices','Examen blanc','Auto-évaluation'], scoreTypeKeys:['quiz','exercises','mock','self'],
+      cats:['Sciences','Droit','Économie','Lettres','Informatique','Médecine','Ingénierie','Autre'],
+      diffs:['Facile','Modérée','Difficile','Très difficile']
+    },
+    developer: {
+      name:'Développeur', desc:'Projets, sprints, probabilité de livraison',
+      itemLabel:'Projet', itemsTab:'Projets', addBtn:'Ajouter un projet', addModal:'Nouveau projet',
+      itemNameLabel:'Nom du projet', itemNamePh:'ex: API Backend, App Mobile...',
+      deadlineLabel:'Date livraison', deadlineLbl:'Livraison',
+      targetLabel:'Heures prévues', predLabel:'Probabilité livraison',
+      predInfoLabel:"La prédiction estime la probabilité de livrer dans les délais selon l'avancement.",
+      noItems:'Aucun projet ajouté', addHint:'Ajoutez votre premier projet pour commencer',
+      addFirst:'Ajouter un projet', passLabel:'Taux de réussite', passThreshold:70,
+      chartGradeLabel:'Avancement des projets (%)', predType:'percent',
+      modes:['Coding','Code Review','Tests','Documentation','Réunion'], modeKeys:['coding','review','testing','docs','meeting'],
+      scoreTypes:['Avancement tâches (%)','Correction bugs','Livraison feature','Revue code'], scoreTypeKeys:['tasks','bugs','feature','review'],
+      cats:['Frontend','Backend','Mobile','DevOps','API','Base de données','IA/ML','Autre'],
+      diffs:['Simple','Modéré','Complexe','Très complexe']
+    },
+    researcher: {
+      name:'Chercheur', desc:'Recherche, publications, score de maturité',
+      itemLabel:'Thème', itemsTab:'Thèmes', addBtn:'Ajouter un thème', addModal:'Nouveau thème de recherche',
+      itemNameLabel:'Nom du thème', itemNamePh:'ex: Machine Learning, Droit européen...',
+      deadlineLabel:'Date soumission', deadlineLbl:'Soumission',
+      targetLabel:'Heures de recherche', predLabel:'Score maturité',
+      predInfoLabel:'La prédiction évalue le niveau de maturité de votre recherche.',
+      noItems:'Aucun thème ajouté', addHint:'Ajoutez votre premier thème de recherche',
+      addFirst:'Ajouter un thème', passLabel:'Seuil de maturité', passThreshold:70,
+      chartGradeLabel:'Maturité de la recherche (%)', predType:'percent',
+      modes:['Lecture','Rédaction','Analyse','Expérience','Présentation'], modeKeys:['reading','writing','analysis','experiment','presentation'],
+      scoreTypes:['Articles lus (%)','Avancement rédaction','Qualité données','Auto-évaluation'], scoreTypeKeys:['papers','writing','data','self'],
+      cats:['Sciences','Sciences sociales','Ingénierie','Médecine','Économie','Droit','Lettres','Autre'],
+      diffs:['Accessible','Modéré','Avancé','Expert']
+    },
+    freelancer: {
+      name:'Freelance', desc:'Clients, heures facturables, livraison à temps',
+      itemLabel:'Projet client', itemsTab:'Projets', addBtn:'Ajouter un projet', addModal:'Nouveau projet client',
+      itemNameLabel:'Nom du projet', itemNamePh:'ex: Site e-commerce, Logo...',
+      deadlineLabel:'Date livraison', deadlineLbl:'Livraison',
+      targetLabel:'Heures facturables', predLabel:'Livraison à temps',
+      predInfoLabel:'La prédiction estime la probabilité de livrer dans les délais client.',
+      noItems:'Aucun projet client', addHint:'Ajoutez votre premier projet client',
+      addFirst:'Ajouter un projet', passLabel:'Taux satisfaction', passThreshold:70,
+      chartGradeLabel:'Satisfaction client (%)', predType:'percent',
+      modes:['Développement','Design','Réunion client','Administration','Révision'], modeKeys:['dev','design','meeting','admin','revision'],
+      scoreTypes:['Satisfaction client (%)','Avancement milestone','Budget utilisé','Révisions reçues'], scoreTypeKeys:['satisfaction','milestone','budget','revisions'],
+      cats:['Web','Design','Consulting','Marketing','Contenu','Mobile','E-commerce','Autre'],
+      diffs:['Simple','Modéré','Complexe','Critique']
+    },
+    designer: {
+      name:'Designer', desc:'Projets créatifs, révisions, satisfaction client',
+      itemLabel:'Projet créatif', itemsTab:'Projets', addBtn:'Ajouter un projet', addModal:'Nouveau projet créatif',
+      itemNameLabel:'Nom du projet', itemNamePh:'ex: Refonte UI, Logo startup...',
+      deadlineLabel:'Date livraison', deadlineLbl:'Livraison',
+      targetLabel:'Heures créatives', predLabel:'Approbation client',
+      predInfoLabel:'La prédiction estime la probabilité d\'approbation finale du client.',
+      noItems:'Aucun projet créatif', addHint:'Ajoutez votre premier projet créatif',
+      addFirst:'Ajouter un projet', passLabel:'Taux approbation', passThreshold:70,
+      chartGradeLabel:'Approbation client (%)', predType:'percent',
+      modes:['Concept','Design','Révision','Présentation','Recherche'], modeKeys:['concept','design','revision','presentation','research'],
+      scoreTypes:['Approbation client (%)','Tours de révision','Qualité design','Respect délai'], scoreTypeKeys:['approval','revisions','quality','deadline'],
+      cats:['UI/UX','Branding','Illustration','Motion','Print','Photo','Web','Autre'],
+      diffs:['Simple','Modéré','Complexe','Très complexe']
+    },
+    teacher: {
+      name:'Enseignant', desc:'Cours, couverture programme, réussite élèves',
+      itemLabel:'Cours', itemsTab:'Cours', addBtn:'Ajouter un cours', addModal:'Nouveau cours',
+      itemNameLabel:'Nom du cours', itemNamePh:'ex: Algèbre, Histoire-Géo...',
+      deadlineLabel:'Fin de période', deadlineLbl:'Fin',
+      targetLabel:'Heures de cours', predLabel:'Réussite élèves',
+      predInfoLabel:'La prédiction estime le taux de réussite de vos élèves selon votre avancement.',
+      noItems:'Aucun cours ajouté', addHint:'Ajoutez votre premier cours',
+      addFirst:'Ajouter un cours', passLabel:'Taux de réussite', passThreshold:70,
+      chartGradeLabel:'Avancement du programme (%)', predType:'percent',
+      modes:['Préparation cours','Correction','Cours en classe','Réunion','Formation'], modeKeys:['prep','grading','teaching','meeting','training'],
+      scoreTypes:['Avancement programme (%)','Réussite élèves','Qualité supports','Auto-évaluation'], scoreTypeKeys:['curriculum','students','materials','self'],
+      cats:['Mathématiques','Sciences','Lettres','Histoire-Géo','Langues','Informatique','Arts','Autre'],
+      diffs:['Débutants','Intermédiaire','Avancé','Expert']
+    },
+    manager: {
+      name:'Manager', desc:'Équipes, KPIs, probabilité d\'atteinte des objectifs',
+      itemLabel:'Équipe', itemsTab:'Équipes', addBtn:'Ajouter une équipe', addModal:'Nouvelle équipe / projet',
+      itemNameLabel:'Nom du projet', itemNamePh:'ex: Lancement produit, Q4 OKRs...',
+      deadlineLabel:'Date objectif', deadlineLbl:'Objectif',
+      targetLabel:'Heures planifiées', predLabel:'Atteinte objectif',
+      predInfoLabel:'La prédiction estime la probabilité d\'atteindre les objectifs fixés.',
+      noItems:'Aucune équipe / projet', addHint:'Ajoutez votre premier projet d\'équipe',
+      addFirst:'Ajouter une équipe', passLabel:'Taux KPI', passThreshold:70,
+      chartGradeLabel:'KPIs atteints (%)', predType:'percent',
+      modes:['Planification','Réunion équipe','Suivi avancement','Reporting','Formation'], modeKeys:['planning','team_meeting','followup','reporting','training'],
+      scoreTypes:['KPIs atteints (%)','Avancement livrable','Moral équipe','Qualité livrables'], scoreTypeKeys:['kpis','deliverable','morale','quality'],
+      cats:['IT/Tech','RH','Marketing','Finance','Opérations','Commercial','Stratégie','Autre'],
+      diffs:['Simple','Modéré','Complexe','Critique']
+    }
   },
   en: {
-    btnAddSubject:'+ Subject',
-    tabs:['Dashboard','Subjects','Analytics','Predictions'],
-    stats:['Subjects tracked','Total time','Avg. score','Today'],
-    activeSession:'Active session',noSession:'No session in progress',
-    selectHint:'Select a subject to start',startSession:'Start a session',
-    modeLabel:'Mode',goalLabel:'Goal (min)',btnStart:'Start session',
-    recent:'Recent sessions',noSessions:'No sessions recorded',noSubjects:'No subjects',
-    addHint:'Add your first subject to get started',btnAddFirst:'+ Add a subject',
-    chartTime:'Study time per subject',chartGrade:'Predicted grade per subject',
-    chartWeekly:'Weekly activity (last 7 days)',
-    noPred:'No predictions available',noPredHint:'Add subjects and sessions to see your predictions',
-    modalSubTitle:'New subject',subName:'Subject name *',subNamePh:'e.g. Mathematics, Civil Law…',
-    subCat:'Category',subDiff:'Perceived difficulty',subHours:'Target hours total',
-    subExam:'Exam date',subDesc:'Description / goals',subDescPh:'Topics covered, goals…',
-    gradeInfo:'⚖️ Scale: 1.0 = best · 4.0 = pass threshold · > 4.0 = fail',
-    cancel:'Cancel',create:'Create subject',
-    scoreTitle:'Log a result',scoreType:'Evaluation type',
-    scoreVal:'Score obtained (%)',scoreComment:'Comment',scoreCommentPh:'Notes about this evaluation…',
-    save:'Save',
-    modes:['Study','Practice','Review','Mock exam'],
-    modeKeys:['study','practice','review','exam'],
-    scoreTypes:['Quiz / test','Exercises','Mock exam','Self-assessment'],
-    scoreTypeKeys:['quiz','exercise','mock_exam','self_eval'],
-    cats:['Sciences','Law','Economics','Humanities','Computer Science','Medicine','Engineering','Other'],
-    diffs:['Easy','Moderate','Difficult','Very difficult'],
-    progress:'Progress',time:'time',avgScore:'avg. score',chance:'chance',
-    info:'Information',category:'Category',difficulty:'Difficulty',targetH:'Target hours',
-    passGrade:'Pass threshold',exam:'Exam',predTitle:'Current prediction',
-    predGrade:'Predicted grade',predChance:'Pass probability',predVerdict:'Verdict',predConf:'Model confidence',
-    progressLabel:'Overall progress',results:'Results',sessions:'Sessions',
-    delete:'Delete',addResult:'+ Result',startSess:'Start session',
-    willPass:'✓ Pass likely',willFail:'✗ Risk of failure',
-    verdictOk:'✓ Likely',verdictKo:'✗ Risky',
-    confHigh:'high',confMed:'medium',confLow:'low',confLowHint:' — add sessions to refine',
-    addResultBtn:'+ Add a result',timeCov:'Time coverage',
-    scoreFac:'Avg. score',consist:'Consistency',confidence:'Confidence',
-    daysLeft:'d until exam',deletedSub:'Subject deleted',
-    deleteConfirm:'Delete this subject and all its data?',
-    sessionRunning:'A session is already running',chooseSubject:'Choose a subject',
-    toastAdded:'added ✓',toastStarted:'Session started — good luck! 🚀',
-    toastSaved:'Session saved ✓',toastScore:'Result saved ✓',
-    toastDeleted:'Subject deleted',toastEnterName:'Enter a subject name',
-    objective:'Goal',remaining:'Remaining',stop:'Stop',stopScore:'Stop + score',
-    gradeLabel:['Excellent','Excellent','Good','Good','Good','Satisfactory','Satisfactory','Sufficient','Sufficient','Sufficient'],
-    predictedGrade:'Predicted grade',hours:'Hours',chooseSubPh:'-- Choose a subject --',
-    passThreshold:'≤ 4.0 to pass',
+    student: {
+      name:'Student', desc:'Courses, exam prep, grade prediction',
+      itemLabel:'Subject', itemsTab:'Subjects', addBtn:'Add a subject', addModal:'New subject',
+      itemNameLabel:'Subject name', itemNamePh:'e.g. Mathematics, Law...',
+      deadlineLabel:'Exam date', deadlineLbl:'Exam',
+      targetLabel:'Target hours', predLabel:'Predicted grade',
+      predInfoLabel:'The prediction uses your sessions and scores to estimate your final grade.',
+      noItems:'No subjects added', addHint:'Add your first subject to get started',
+      addFirst:'Add a subject', passLabel:'Pass grade', passThreshold:10,
+      chartGradeLabel:'Grade progression', predType:'grade',
+      modes:['Study','Practice','Review','Mock exam'], modeKeys:['study','practice','review','exam'],
+      scoreTypes:['Quiz / test','Exercises','Mock exam','Self-assessment'], scoreTypeKeys:['quiz','exercises','mock','self'],
+      cats:['Sciences','Law','Economics','Humanities','Computer Science','Medicine','Engineering','Other'],
+      diffs:['Easy','Moderate','Difficult','Very difficult']
+    },
+    developer: {
+      name:'Developer', desc:'Projects, sprints, delivery probability',
+      itemLabel:'Project', itemsTab:'Projects', addBtn:'Add a project', addModal:'New project',
+      itemNameLabel:'Project name', itemNamePh:'e.g. Backend API, Mobile App...',
+      deadlineLabel:'Delivery date', deadlineLbl:'Delivery',
+      targetLabel:'Estimated hours', predLabel:'Delivery probability',
+      predInfoLabel:'The prediction estimates on-time delivery probability based on progress.',
+      noItems:'No projects added', addHint:'Add your first project to get started',
+      addFirst:'Add a project', passLabel:'Success rate', passThreshold:70,
+      chartGradeLabel:'Project progress (%)', predType:'percent',
+      modes:['Coding','Code Review','Testing','Documentation','Meeting'], modeKeys:['coding','review','testing','docs','meeting'],
+      scoreTypes:['Task completion (%)','Bug fixing','Feature delivery','Code review'], scoreTypeKeys:['tasks','bugs','feature','review'],
+      cats:['Frontend','Backend','Mobile','DevOps','API','Database','AI/ML','Other'],
+      diffs:['Simple','Moderate','Complex','Very complex']
+    },
+    researcher: {
+      name:'Researcher', desc:'Research, publications, maturity score',
+      itemLabel:'Topic', itemsTab:'Topics', addBtn:'Add a topic', addModal:'New research topic',
+      itemNameLabel:'Topic name', itemNamePh:'e.g. Machine Learning, European Law...',
+      deadlineLabel:'Submission date', deadlineLbl:'Submission',
+      targetLabel:'Research hours', predLabel:'Maturity score',
+      predInfoLabel:'The prediction evaluates the maturity level of your research.',
+      noItems:'No topics added', addHint:'Add your first research topic',
+      addFirst:'Add a topic', passLabel:'Maturity threshold', passThreshold:70,
+      chartGradeLabel:'Research maturity (%)', predType:'percent',
+      modes:['Reading','Writing','Analysis','Experiment','Presentation'], modeKeys:['reading','writing','analysis','experiment','presentation'],
+      scoreTypes:['Papers read (%)','Writing progress','Data quality','Self-assessment'], scoreTypeKeys:['papers','writing','data','self'],
+      cats:['Sciences','Social Sciences','Engineering','Medicine','Economics','Law','Humanities','Other'],
+      diffs:['Accessible','Moderate','Advanced','Expert']
+    },
+    freelancer: {
+      name:'Freelancer', desc:'Clients, billable hours, on-time delivery',
+      itemLabel:'Client project', itemsTab:'Projects', addBtn:'Add a project', addModal:'New client project',
+      itemNameLabel:'Project name', itemNamePh:'e.g. E-commerce site, Logo...',
+      deadlineLabel:'Delivery date', deadlineLbl:'Delivery',
+      targetLabel:'Billable hours', predLabel:'On-time delivery',
+      predInfoLabel:'The prediction estimates the probability of delivering on time for the client.',
+      noItems:'No client projects', addHint:'Add your first client project',
+      addFirst:'Add a project', passLabel:'Satisfaction rate', passThreshold:70,
+      chartGradeLabel:'Client satisfaction (%)', predType:'percent',
+      modes:['Development','Design','Client meeting','Admin','Revision'], modeKeys:['dev','design','meeting','admin','revision'],
+      scoreTypes:['Client satisfaction (%)','Milestone progress','Budget usage','Revisions received'], scoreTypeKeys:['satisfaction','milestone','budget','revisions'],
+      cats:['Web','Design','Consulting','Marketing','Content','Mobile','E-commerce','Other'],
+      diffs:['Simple','Moderate','Complex','Critical']
+    },
+    designer: {
+      name:'Designer', desc:'Creative projects, revisions, client satisfaction',
+      itemLabel:'Creative project', itemsTab:'Projects', addBtn:'Add a project', addModal:'New creative project',
+      itemNameLabel:'Project name', itemNamePh:'e.g. UI redesign, Startup logo...',
+      deadlineLabel:'Delivery date', deadlineLbl:'Delivery',
+      targetLabel:'Creative hours', predLabel:'Client approval',
+      predInfoLabel:"The prediction estimates the probability of final client approval.",
+      noItems:'No creative projects', addHint:'Add your first creative project',
+      addFirst:'Add a project', passLabel:'Approval rate', passThreshold:70,
+      chartGradeLabel:'Client approval (%)', predType:'percent',
+      modes:['Concept','Design','Revision','Presentation','Research'], modeKeys:['concept','design','revision','presentation','research'],
+      scoreTypes:['Client approval (%)','Revision rounds','Design quality','Deadline adherence'], scoreTypeKeys:['approval','revisions','quality','deadline'],
+      cats:['UI/UX','Branding','Illustration','Motion','Print','Photography','Web','Other'],
+      diffs:['Simple','Moderate','Complex','Very complex']
+    },
+    teacher: {
+      name:'Teacher', desc:'Courses, curriculum coverage, student success',
+      itemLabel:'Course', itemsTab:'Courses', addBtn:'Add a course', addModal:'New course',
+      itemNameLabel:'Course name', itemNamePh:'e.g. Algebra, World History...',
+      deadlineLabel:'Period end', deadlineLbl:'End',
+      targetLabel:'Teaching hours', predLabel:'Student success',
+      predInfoLabel:'The prediction estimates student success rate based on curriculum progress.',
+      noItems:'No courses added', addHint:'Add your first course',
+      addFirst:'Add a course', passLabel:'Success rate', passThreshold:70,
+      chartGradeLabel:'Curriculum progress (%)', predType:'percent',
+      modes:['Lesson prep','Grading','Teaching','Meeting','Training'], modeKeys:['prep','grading','teaching','meeting','training'],
+      scoreTypes:['Curriculum progress (%)','Student success rate','Material quality','Self-assessment'], scoreTypeKeys:['curriculum','students','materials','self'],
+      cats:['Mathematics','Sciences','Humanities','History','Languages','Computer Science','Arts','Other'],
+      diffs:['Beginners','Intermediate','Advanced','Expert']
+    },
+    manager: {
+      name:'Manager', desc:'Teams, KPIs, goal achievement probability',
+      itemLabel:'Team', itemsTab:'Teams', addBtn:'Add a team', addModal:'New team / project',
+      itemNameLabel:'Project name', itemNamePh:'e.g. Product launch, Q4 OKRs...',
+      deadlineLabel:'Target date', deadlineLbl:'Target',
+      targetLabel:'Planned hours', predLabel:'Goal achievement',
+      predInfoLabel:'The prediction estimates the probability of achieving set goals.',
+      noItems:'No teams / projects', addHint:'Add your first team project',
+      addFirst:'Add a team', passLabel:'KPI rate', passThreshold:70,
+      chartGradeLabel:'KPIs achieved (%)', predType:'percent',
+      modes:['Planning','Team meeting','Progress review','Reporting','Training'], modeKeys:['planning','team_meeting','followup','reporting','training'],
+      scoreTypes:['KPIs achieved (%)','Deliverable progress','Team morale','Deliverable quality'], scoreTypeKeys:['kpis','deliverable','morale','quality'],
+      cats:['IT/Tech','HR','Marketing','Finance','Operations','Sales','Strategy','Other'],
+      diffs:['Simple','Moderate','Complex','Critical']
+    }
   },
   de: {
-    btnAddSubject:'+ Fach',
-    tabs:['Dashboard','Fächer','Analytik','Prognosen'],
-    stats:['Verfolgte Fächer','Gesamtzeit','Ø-Score','Heute'],
-    activeSession:'Aktive Sitzung',noSession:'Keine Sitzung aktiv',
-    selectHint:'Wählen Sie ein Fach aus',startSession:'Sitzung starten',
-    modeLabel:'Modus',goalLabel:'Ziel (Min.)',btnStart:'Sitzung starten',
-    recent:'Letzte Sitzungen',noSessions:'Keine Sitzungen gespeichert',noSubjects:'Keine Fächer',
-    addHint:'Fügen Sie Ihr erstes Fach hinzu',btnAddFirst:'+ Fach hinzufügen',
-    chartTime:'Lernzeit pro Fach',chartGrade:'Voraussichtliche Note pro Fach',
-    chartWeekly:'Wöchentliche Aktivität (letzte 7 Tage)',
-    noPred:'Keine Prognosen verfügbar',noPredHint:'Fügen Sie Fächer und Sitzungen hinzu',
-    modalSubTitle:'Neues Fach',subName:'Fachname *',subNamePh:'z.B. Mathematik, Bürgerliches Recht…',
-    subCat:'Kategorie',subDiff:'Schwierigkeitsgrad',subHours:'Gesamte Zielstunden',
-    subExam:'Prüfungsdatum',subDesc:'Beschreibung / Ziele',subDescPh:'Behandelte Themen, Ziele…',
-    gradeInfo:'⚖️ Notenskala: 1,0 = beste Note · 4,0 = Bestehensgrenze · > 4,0 = nicht bestanden',
-    cancel:'Abbrechen',create:'Fach erstellen',
-    scoreTitle:'Ergebnis erfassen',scoreType:'Bewertungsart',
-    scoreVal:'Erreichter Score (%)',scoreComment:'Kommentar',scoreCommentPh:'Notizen zu dieser Bewertung…',
+    student: {
+      name:'Student', desc:'Kurse, Prüfungsvorbereitung, Notenvorhersage',
+      itemLabel:'Fach', itemsTab:'Fächer', addBtn:'Fach hinzufügen', addModal:'Neues Fach',
+      itemNameLabel:'Fachname', itemNamePh:'z.B. Mathematik, Recht...',
+      deadlineLabel:'Prüfungsdatum', deadlineLbl:'Prüfung',
+      targetLabel:'Zielstunden', predLabel:'Vorhergesagte Note',
+      predInfoLabel:'Die Vorhersage nutzt Ihre Sitzungen und Ergebnisse zur Schätzung Ihrer Endnote.',
+      noItems:'Keine Fächer hinzugefügt', addHint:'Fügen Sie Ihr erstes Fach hinzu',
+      addFirst:'Fach hinzufügen', passLabel:'Bestehensgrenze', passThreshold:10,
+      chartGradeLabel:'Notenentwicklung', predType:'grade',
+      modes:['Lernen','Üben','Wiederholen','Prüfungssimulation'], modeKeys:['study','practice','review','exam'],
+      scoreTypes:['Quiz / Test','Übungen','Probeprüfung','Selbstbewertung'], scoreTypeKeys:['quiz','exercises','mock','self'],
+      cats:['Naturwissenschaften','Recht','Wirtschaft','Geisteswissenschaften','Informatik','Medizin','Ingenieurwesen','Sonstiges'],
+      diffs:['Leicht','Mittel','Schwer','Sehr schwer']
+    },
+    developer: {
+      name:'Entwickler', desc:'Projekte, Sprints, Lieferwahrscheinlichkeit',
+      itemLabel:'Projekt', itemsTab:'Projekte', addBtn:'Projekt hinzufügen', addModal:'Neues Projekt',
+      itemNameLabel:'Projektname', itemNamePh:'z.B. Backend-API, Mobile App...',
+      deadlineLabel:'Lieferdatum', deadlineLbl:'Lieferung',
+      targetLabel:'Geplante Stunden', predLabel:'Lieferwahrscheinlichkeit',
+      predInfoLabel:'Die Vorhersage schätzt die Wahrscheinlichkeit pünktlicher Lieferung.',
+      noItems:'Keine Projekte hinzugefügt', addHint:'Fügen Sie Ihr erstes Projekt hinzu',
+      addFirst:'Projekt hinzufügen', passLabel:'Erfolgsrate', passThreshold:70,
+      chartGradeLabel:'Projektfortschritt (%)', predType:'percent',
+      modes:['Coding','Code Review','Tests','Dokumentation','Meeting'], modeKeys:['coding','review','testing','docs','meeting'],
+      scoreTypes:['Aufgabenabschluss (%)','Fehlerbehebung','Feature-Lieferung','Code Review'], scoreTypeKeys:['tasks','bugs','feature','review'],
+      cats:['Frontend','Backend','Mobile','DevOps','API','Datenbank','KI/ML','Sonstiges'],
+      diffs:['Einfach','Mittel','Komplex','Sehr komplex']
+    },
+    researcher: {
+      name:'Forscher', desc:'Forschung, Publikationen, Reifegrad',
+      itemLabel:'Thema', itemsTab:'Themen', addBtn:'Thema hinzufügen', addModal:'Neues Forschungsthema',
+      itemNameLabel:'Themenname', itemNamePh:'z.B. Machine Learning, EU-Recht...',
+      deadlineLabel:'Einreichungsdatum', deadlineLbl:'Einreichung',
+      targetLabel:'Forschungsstunden', predLabel:'Reifegrad',
+      predInfoLabel:'Die Vorhersage bewertet den Reifegrad Ihrer Forschung.',
+      noItems:'Keine Themen hinzugefügt', addHint:'Fügen Sie Ihr erstes Forschungsthema hinzu',
+      addFirst:'Thema hinzufügen', passLabel:'Reifeschwelle', passThreshold:70,
+      chartGradeLabel:'Forschungsreife (%)', predType:'percent',
+      modes:['Lesen','Schreiben','Analyse','Experiment','Präsentation'], modeKeys:['reading','writing','analysis','experiment','presentation'],
+      scoreTypes:['Artikel gelesen (%)','Schreibfortschritt','Datenqualität','Selbstbewertung'], scoreTypeKeys:['papers','writing','data','self'],
+      cats:['Naturwissenschaften','Sozialwissenschaften','Ingenieurwesen','Medizin','Wirtschaft','Recht','Geisteswissenschaften','Sonstiges'],
+      diffs:['Zugänglich','Mittel','Fortgeschritten','Experte']
+    },
+    freelancer: {
+      name:'Freelancer', desc:'Kunden, abrechenbare Stunden, pünktliche Lieferung',
+      itemLabel:'Kundenprojekt', itemsTab:'Projekte', addBtn:'Projekt hinzufügen', addModal:'Neues Kundenprojekt',
+      itemNameLabel:'Projektname', itemNamePh:'z.B. E-Commerce-Website, Logo...',
+      deadlineLabel:'Lieferdatum', deadlineLbl:'Lieferung',
+      targetLabel:'Abrechenbare Stunden', predLabel:'Pünktliche Lieferung',
+      predInfoLabel:'Die Vorhersage schätzt die Wahrscheinlichkeit pünktlicher Lieferung.',
+      noItems:'Keine Kundenprojekte', addHint:'Fügen Sie Ihr erstes Kundenprojekt hinzu',
+      addFirst:'Projekt hinzufügen', passLabel:'Zufriedenheitsrate', passThreshold:70,
+      chartGradeLabel:'Kundenzufriedenheit (%)', predType:'percent',
+      modes:['Entwicklung','Design','Kundenmeeting','Administration','Überarbeitung'], modeKeys:['dev','design','meeting','admin','revision'],
+      scoreTypes:['Kundenzufriedenheit (%)','Meilensteinfortschritt','Budgetnutzung','Überarbeitungen'], scoreTypeKeys:['satisfaction','milestone','budget','revisions'],
+      cats:['Web','Design','Consulting','Marketing','Content','Mobile','E-Commerce','Sonstiges'],
+      diffs:['Einfach','Mittel','Komplex','Kritisch']
+    },
+    designer: {
+      name:'Designer', desc:'Kreativprojekte, Überarbeitungen, Kundenzufriedenheit',
+      itemLabel:'Kreativprojekt', itemsTab:'Projekte', addBtn:'Projekt hinzufügen', addModal:'Neues Kreativprojekt',
+      itemNameLabel:'Projektname', itemNamePh:'z.B. UI-Redesign, Startup-Logo...',
+      deadlineLabel:'Lieferdatum', deadlineLbl:'Lieferung',
+      targetLabel:'Kreativstunden', predLabel:'Kundengenehmigung',
+      predInfoLabel:'Die Vorhersage schätzt die Wahrscheinlichkeit der finalen Kundengenehmigung.',
+      noItems:'Keine Kreativprojekte', addHint:'Fügen Sie Ihr erstes Kreativprojekt hinzu',
+      addFirst:'Projekt hinzufügen', passLabel:'Genehmigungsrate', passThreshold:70,
+      chartGradeLabel:'Kundengenehmigung (%)', predType:'percent',
+      modes:['Konzept','Design','Überarbeitung','Präsentation','Recherche'], modeKeys:['concept','design','revision','presentation','research'],
+      scoreTypes:['Kundengenehmigung (%)','Überarbeitungsrunden','Designqualität','Deadline-Einhaltung'], scoreTypeKeys:['approval','revisions','quality','deadline'],
+      cats:['UI/UX','Branding','Illustration','Motion','Print','Fotografie','Web','Sonstiges'],
+      diffs:['Einfach','Mittel','Komplex','Sehr komplex']
+    },
+    teacher: {
+      name:'Lehrer', desc:'Kurse, Lehrplanabdeckung, Schülererfolg',
+      itemLabel:'Kurs', itemsTab:'Kurse', addBtn:'Kurs hinzufügen', addModal:'Neuer Kurs',
+      itemNameLabel:'Kursname', itemNamePh:'z.B. Algebra, Weltgeschichte...',
+      deadlineLabel:'Periodenende', deadlineLbl:'Ende',
+      targetLabel:'Unterrichtsstunden', predLabel:'Schülererfolg',
+      predInfoLabel:'Die Vorhersage schätzt den Schülererfolg basierend auf dem Lehrplanfortschritt.',
+      noItems:'Keine Kurse hinzugefügt', addHint:'Fügen Sie Ihren ersten Kurs hinzu',
+      addFirst:'Kurs hinzufügen', passLabel:'Erfolgsrate', passThreshold:70,
+      chartGradeLabel:'Lehrplanfortschritt (%)', predType:'percent',
+      modes:['Unterrichtsvorbereitung','Korrektur','Unterricht','Meeting','Fortbildung'], modeKeys:['prep','grading','teaching','meeting','training'],
+      scoreTypes:['Lehrplanfortschritt (%)','Schülererfolgsquote','Materialqualität','Selbstbewertung'], scoreTypeKeys:['curriculum','students','materials','self'],
+      cats:['Mathematik','Naturwissenschaften','Geisteswissenschaften','Geschichte','Sprachen','Informatik','Kunst','Sonstiges'],
+      diffs:['Anfänger','Mittelstufe','Fortgeschritten','Experte']
+    },
+    manager: {
+      name:'Manager', desc:'Teams, KPIs, Zielerreichungswahrscheinlichkeit',
+      itemLabel:'Team', itemsTab:'Teams', addBtn:'Team hinzufügen', addModal:'Neues Team / Projekt',
+      itemNameLabel:'Projektname', itemNamePh:'z.B. Produktlaunch, Q4 OKRs...',
+      deadlineLabel:'Zieldatum', deadlineLbl:'Ziel',
+      targetLabel:'Geplante Stunden', predLabel:'Zielerreichung',
+      predInfoLabel:'Die Vorhersage schätzt die Wahrscheinlichkeit der Zielerreichung.',
+      noItems:'Keine Teams / Projekte', addHint:'Fügen Sie Ihr erstes Teamprojekt hinzu',
+      addFirst:'Team hinzufügen', passLabel:'KPI-Rate', passThreshold:70,
+      chartGradeLabel:'KPIs erreicht (%)', predType:'percent',
+      modes:['Planung','Teammeeting','Fortschrittscheck','Reporting','Schulung'], modeKeys:['planning','team_meeting','followup','reporting','training'],
+      scoreTypes:['KPIs erreicht (%)','Lieferfortschritt','Teammoral','Lieferqualität'], scoreTypeKeys:['kpis','deliverable','morale','quality'],
+      cats:['IT/Tech','HR','Marketing','Finanzen','Betrieb','Vertrieb','Strategie','Sonstiges'],
+      diffs:['Einfach','Mittel','Komplex','Kritisch']
+    }
+  }
+};
+
+// ─────────────────── GENERIC TRANSLATIONS ───────────────────
+const T = {
+  fr: {
+    tabs:['Tableau de bord','','Analytiques','Prédictions'],
+    stats:['Total items','Séances aujourd\'hui','Heures cette semaine','Score moyen'],
+    activeSession:'Session en cours',
+    noSession:'Aucune session active',
+    selectHint:'Sélectionnez un item',
+    startSession:'Démarrer',
+    modeLabel:'Mode',
+    goalLabel:'Objectif (minutes)',
+    btnStart:'Démarrer la session',
+    recent:'Séances récentes',
+    noSessions:'Aucune séance',
+    chartTime:'Temps par item (h)',
+    chartWeekly:'Activité hebdo (h)',
+    noPred:'Aucune prédiction',
+    noPredHint:'Ajoutez des items et des séances pour voir des prédictions',
+    subCat:'Catégorie',
+    subDiff:'Difficulté',
+    subHours:'Heures cibles',
+    cancel:'Annuler',
+    save:'Enregistrer',
+    progress:'Progression',
+    time:'Temps',
+    avgScore:'Score moyen',
+    chance:'Probabilité',
+    info:'Info',
+    category:'Catégorie',
+    difficulty:'Difficulté',
+    targetH:'Heures cibles',
+    passGrade:'Note de passage',
+    exam:'Examen',
+    predTitle:'Prédiction',
+    predGrade:'Note prédite',
+    predChance:'Probabilité de réussite',
+    predVerdict:'Verdict',
+    predConf:'Confiance',
+    progressLabel:'Progression',
+    results:'Résultats',
+    sessions:'Séances',
+    delete:'Supprimer',
+    addResult:'Ajouter un score',
+    startSess:'Démarrer une séance',
+    willPass:'Va réussir',
+    willFail:'Risque d\'échec',
+    verdictOk:'✓ Bon cap',
+    verdictKo:'✗ Attention requise',
+    confHigh:'Confiance élevée',
+    confMed:'Confiance modérée',
+    confLow:'Confiance faible',
+    confLowHint:'Ajoutez plus de séances et de scores.',
+    addResultBtn:'+ Score',
+    timeCov:'Couverture temps',
+    scoreFac:'Facteur score',
+    consist:'Régularité',
+    confidence:'Confiance',
+    daysLeft:'jours restants',
+    deletedSub:'Item supprimé',
+    deleteConfirm:'Supprimer définitivement cet item ?',
+    sessionRunning:'Session en cours !',
+    chooseSubject:'Choisir un item',
+    toastAdded:'Item ajouté',
+    toastStarted:'Session démarrée',
+    toastSaved:'Enregistré',
+    toastScore:'Score ajouté',
+    toastDeleted:'Supprimé',
+    toastEnterName:'Entrez un nom',
+    objective:'Objectif',
+    remaining:'restant',
+    stop:'Terminer',
+    stopScore:'Notez cette session (0-100)',
+    gradeLabel:['Excellent','Très bien','Bien','Assez bien','Passable','Insuffisant'],
+    predictedGrade:'Note prédite',
+    hours:'heures',
+    chooseSubPh:'Choisir...',
+    passThreshold:'Seuil de réussite',
+    scoreVal:'Score (0-100)',
+    scoreComment:'Commentaire',
+    scoreCommentPh:'Optionnel...',
+    scoreType:'Type de score'
+  },
+  en: {
+    tabs:['Dashboard','','Analytics','Predictions'],
+    stats:['Total items','Sessions today','Hours this week','Avg score'],
+    activeSession:'Active session',
+    noSession:'No active session',
+    selectHint:'Select an item',
+    startSession:'Start',
+    modeLabel:'Mode',
+    goalLabel:'Goal (minutes)',
+    btnStart:'Start session',
+    recent:'Recent sessions',
+    noSessions:'No sessions yet',
+    chartTime:'Time per item (h)',
+    chartWeekly:'Weekly activity (h)',
+    noPred:'No predictions yet',
+    noPredHint:'Add items and sessions to see predictions',
+    subCat:'Category',
+    subDiff:'Difficulty',
+    subHours:'Target hours',
+    cancel:'Cancel',
+    save:'Save',
+    progress:'Progress',
+    time:'Time',
+    avgScore:'Avg score',
+    chance:'Probability',
+    info:'Info',
+    category:'Category',
+    difficulty:'Difficulty',
+    targetH:'Target hours',
+    passGrade:'Pass grade',
+    exam:'Exam',
+    predTitle:'Prediction',
+    predGrade:'Predicted grade',
+    predChance:'Pass probability',
+    predVerdict:'Verdict',
+    predConf:'Confidence',
+    progressLabel:'Progress',
+    results:'Results',
+    sessions:'Sessions',
+    delete:'Delete',
+    addResult:'Add a score',
+    startSess:'Start a session',
+    willPass:'Will pass',
+    willFail:'At risk',
+    verdictOk:'✓ On track',
+    verdictKo:'✗ Needs attention',
+    confHigh:'High confidence',
+    confMed:'Moderate confidence',
+    confLow:'Low confidence',
+    confLowHint:'Add more sessions and scores.',
+    addResultBtn:'+ Score',
+    timeCov:'Time coverage',
+    scoreFac:'Score factor',
+    consist:'Consistency',
+    confidence:'Confidence',
+    daysLeft:'days left',
+    deletedSub:'Item deleted',
+    deleteConfirm:'Permanently delete this item?',
+    sessionRunning:'Session already running!',
+    chooseSubject:'Choose an item',
+    toastAdded:'Item added',
+    toastStarted:'Session started',
+    toastSaved:'Saved',
+    toastScore:'Score added',
+    toastDeleted:'Deleted',
+    toastEnterName:'Enter a name',
+    objective:'Goal',
+    remaining:'remaining',
+    stop:'Stop',
+    stopScore:'Rate this session (0-100)',
+    gradeLabel:['Excellent','Very good','Good','Satisfactory','Sufficient','Insufficient'],
+    predictedGrade:'Predicted grade',
+    hours:'hours',
+    chooseSubPh:'Choose...',
+    passThreshold:'Pass threshold',
+    scoreVal:'Score (0-100)',
+    scoreComment:'Comment',
+    scoreCommentPh:'Optional...',
+    scoreType:'Score type'
+  },
+  de: {
+    tabs:['Dashboard','','Analytik','Vorhersagen'],
+    stats:['Gesamt Items','Sitzungen heute','Stunden diese Woche','Ø Bewertung'],
+    activeSession:'Aktive Sitzung',
+    noSession:'Keine aktive Sitzung',
+    selectHint:'Item auswählen',
+    startSession:'Starten',
+    modeLabel:'Modus',
+    goalLabel:'Ziel (Minuten)',
+    btnStart:'Sitzung starten',
+    recent:'Letzte Sitzungen',
+    noSessions:'Keine Sitzungen',
+    chartTime:'Zeit pro Item (h)',
+    chartWeekly:'Wöchentliche Aktivität (h)',
+    noPred:'Noch keine Vorhersagen',
+    noPredHint:'Items und Sitzungen hinzufügen für Vorhersagen',
+    subCat:'Kategorie',
+    subDiff:'Schwierigkeit',
+    subHours:'Zielstunden',
+    cancel:'Abbrechen',
     save:'Speichern',
-    modes:['Lernen','Üben','Wiederholen','Prüfungssimulation'],
-    modeKeys:['study','practice','review','exam'],
-    scoreTypes:['Quiz / Test','Übungen','Probeprüfung','Selbstbewertung'],
-    scoreTypeKeys:['quiz','exercise','mock_exam','self_eval'],
-    cats:['Naturwissenschaften','Recht','Wirtschaft','Geisteswissenschaften','Informatik','Medizin','Ingenieurwesen','Sonstiges'],
-    diffs:['Leicht','Mittel','Schwer','Sehr schwer'],
-    progress:'Fortschritt',time:'Zeit',avgScore:'Ø-Score',chance:'Chance',
-    info:'Informationen',category:'Kategorie',difficulty:'Schwierigkeitsgrad',targetH:'Zielstunden',
-    passGrade:'Bestehensgrenze',exam:'Prüfung',predTitle:'Aktuelle Prognose',
-    predGrade:'Voraussichtliche Note',predChance:'Bestehenswahrscheinlichkeit',predVerdict:'Fazit',predConf:'Modellvertrauen',
-    progressLabel:'Gesamtfortschritt',results:'Ergebnisse',sessions:'Sitzungen',
-    delete:'Löschen',addResult:'+ Ergebnis',startSess:'Sitzung starten',
-    willPass:'✓ Bestehen wahrscheinlich',willFail:'✗ Nicht bestehen riskiert',
-    verdictOk:'✓ Wahrscheinlich',verdictKo:'✗ Riskant',
-    confHigh:'hoch',confMed:'mittel',confLow:'gering',confLowHint:' — fügen Sie Sitzungen hinzu',
-    addResultBtn:'+ Ergebnis hinzufügen',timeCov:'Zeitabdeckung',
-    scoreFac:'Ø-Score',consist:'Regelmäßigkeit',confidence:'Vertrauen',
-    daysLeft:'T. bis Prüfung',deletedSub:'Fach gelöscht',
-    deleteConfirm:'Dieses Fach und alle Daten löschen?',
-    sessionRunning:'Eine Sitzung läuft bereits',chooseSubject:'Wählen Sie ein Fach',
-    toastAdded:'hinzugefügt ✓',toastStarted:'Sitzung gestartet — viel Erfolg! 🚀',
-    toastSaved:'Sitzung gespeichert ✓',toastScore:'Ergebnis gespeichert ✓',
-    toastDeleted:'Fach gelöscht',toastEnterName:'Geben Sie einen Fachnamen ein',
-    objective:'Ziel',remaining:'Verbleibend',stop:'Beenden',stopScore:'Beenden + Score',
-    gradeLabel:['Sehr gut','Sehr gut','Gut','Gut','Gut','Befriedigend','Befriedigend','Ausreichend','Ausreichend','Ausreichend'],
-    predictedGrade:'Voraussichtliche Note',hours:'Stunden',chooseSubPh:'-- Fach wählen --',
-    passThreshold:'≤ 4,0 zum Bestehen',
+    progress:'Fortschritt',
+    time:'Zeit',
+    avgScore:'Ø Bewertung',
+    chance:'Wahrscheinlichkeit',
+    info:'Info',
+    category:'Kategorie',
+    difficulty:'Schwierigkeit',
+    targetH:'Zielstunden',
+    passGrade:'Bestehensnote',
+    exam:'Prüfung',
+    predTitle:'Vorhersage',
+    predGrade:'Vorhergesagte Note',
+    predChance:'Bestehenwahrscheinlichkeit',
+    predVerdict:'Urteil',
+    predConf:'Konfidenz',
+    progressLabel:'Fortschritt',
+    results:'Ergebnisse',
+    sessions:'Sitzungen',
+    delete:'Löschen',
+    addResult:'Ergebnis hinzufügen',
+    startSess:'Sitzung starten',
+    willPass:'Wird bestehen',
+    willFail:'Gefährdet',
+    verdictOk:'✓ Auf Kurs',
+    verdictKo:'✗ Aufmerksamkeit nötig',
+    confHigh:'Hohe Konfidenz',
+    confMed:'Mittlere Konfidenz',
+    confLow:'Niedrige Konfidenz',
+    confLowHint:'Mehr Sitzungen und Bewertungen hinzufügen.',
+    addResultBtn:'+ Bewertung',
+    timeCov:'Zeitabdeckung',
+    scoreFac:'Bewertungsfaktor',
+    consist:'Regelmäßigkeit',
+    confidence:'Konfidenz',
+    daysLeft:'Tage verbleibend',
+    deletedSub:'Item gelöscht',
+    deleteConfirm:'Dieses Item dauerhaft löschen?',
+    sessionRunning:'Sitzung läuft bereits!',
+    chooseSubject:'Item auswählen',
+    toastAdded:'Item hinzugefügt',
+    toastStarted:'Sitzung gestartet',
+    toastSaved:'Gespeichert',
+    toastScore:'Bewertung hinzugefügt',
+    toastDeleted:'Gelöscht',
+    toastEnterName:'Namen eingeben',
+    objective:'Ziel',
+    remaining:'verbleibend',
+    stop:'Beenden',
+    stopScore:'Sitzung bewerten (0-100)',
+    gradeLabel:['Sehr gut','Gut','Befriedigend','Ausreichend','Mangelhaft','Ungenügend'],
+    predictedGrade:'Vorhergesagte Note',
+    hours:'Stunden',
+    chooseSubPh:'Auswählen...',
+    passThreshold:'Bestehensschwelle',
+    scoreVal:'Bewertung (0-100)',
+    scoreComment:'Kommentar',
+    scoreCommentPh:'Optional...',
+    scoreType:'Bewertungstyp'
   }
 };
 
-// ═══════════════════════════════════════════════════════
-// GRADE SYSTEM
-// ═══════════════════════════════════════════════════════
-const VALID_GRADES = [1.0,1.3,1.7,2.0,2.3,2.7,3.0,3.3,3.7,4.0,4.3,4.7,5.0];
-const PASS_GRADES  = [1.0,1.3,1.7,2.0,2.3,2.7,3.0,3.3,3.7,4.0];
+// ─────────────────── ROLE METADATA ───────────────────
+const ROLE_META = {
+  student:   { icon:'🎓', color:'#8b5cf6', tw:'violet' },
+  developer: { icon:'💻', color:'#3b82f6', tw:'blue' },
+  researcher:{ icon:'🔬', color:'#10b981', tw:'emerald' },
+  freelancer:{ icon:'💼', color:'#f59e0b', tw:'amber' },
+  designer:  { icon:'🎨', color:'#ec4899', tw:'pink' },
+  teacher:   { icon:'📚', color:'#6366f1', tw:'indigo' },
+  manager:   { icon:'📋', color:'#f97316', tw:'orange' }
+};
 
-function snapGrade(raw) {
-  return VALID_GRADES.reduce((b,g)=>Math.abs(g-raw)<Math.abs(b-raw)?g:b);
-}
-function gradeColor(g) {
-  if(g<=1.7)return'emerald';if(g<=2.7)return'cyan';if(g<=3.7)return'amber';if(g<=4.0)return'orange';return'red';
-}
-function gradeLabel(g,lang) {
-  const idx=PASS_GRADES.indexOf(g);
-  if(idx===-1)return lang==='de'?'Nicht bestanden':lang==='en'?'Failed':'Échoué';
-  return T[lang].gradeLabel[idx]||'';
-}
+// ─────────────────── STATE ───────────────────
+let currentLang = localStorage.getItem('sgp_lang') || 'en';
+let currentRole = null;
+let currentTab  = 0;
+let activeSubjectId = null; // detail modal
+let activeSessionId = null;
+let sessionInterval = null;
+let sessionStartTs  = null;
+let charts = {};
 
-// ═══════════════════════════════════════════════════════
-// DATA LAYER
-// ═══════════════════════════════════════════════════════
+// ─────────────────── DB ───────────────────
 const DB = {
-  get subjects(){return JSON.parse(localStorage.getItem('st_subjects')||'[]')},
-  set subjects(v){localStorage.setItem('st_subjects',JSON.stringify(v))},
-  get sessions(){return JSON.parse(localStorage.getItem('st_sessions')||'[]')},
-  set sessions(v){localStorage.setItem('st_sessions',JSON.stringify(v))},
-  get scores(){return JSON.parse(localStorage.getItem('st_scores')||'[]')},
-  set scores(v){localStorage.setItem('st_scores',JSON.stringify(v))},
-  get lang(){return localStorage.getItem('st_lang')||'en'},
-  set lang(v){localStorage.setItem('st_lang',v)},
+  subs()    { return JSON.parse(localStorage.getItem('sgp_subjects')||'[]'); },
+  saveSubs(a){ localStorage.setItem('sgp_subjects', JSON.stringify(a)); },
+  sess()    { return JSON.parse(localStorage.getItem('sgp_sessions')||'[]'); },
+  saveSess(a){ localStorage.setItem('sgp_sessions', JSON.stringify(a)); }
 };
 
-// ═══════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════
-let activeSession=null,timerInterval=null,currentTab='dashboard',charts={},currentLang=DB.lang;
-
-// ═══════════════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════════════
-const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
-const fmt=s=>{const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;return h?`${h}h ${m.toString().padStart(2,'0')}min`:`${m}min ${sc.toString().padStart(2,'0')}s`};
-const fmtH=s=>(s/3600).toFixed(1)+'h';
-const todayStr=()=>new Date().toISOString().split('T')[0];
-const t=key=>T[currentLang][key]||key;
-
-const toast=(msg,color='emerald')=>{
-  const el=document.getElementById('toast'),ti=document.getElementById('toast-inner');
-  ti.textContent=msg;ti.className=`glass px-5 py-3 rounded-xl text-sm font-medium text-${color}-400 border border-${color}-500/20 fade-in`;
-  el.classList.remove('hidden');clearTimeout(el._to);el._to=setTimeout(()=>el.classList.add('hidden'),2800);
-};
-
-// ═══════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════
-function initApp() {
-  const d=new Date();d.setDate(d.getDate()+90);
-  document.getElementById('sub-exam-date').value=d.toISOString().split('T')[0];
-  document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang));
-  applyTranslations();
-  setTab('dashboard');
-  renderHeroStats();
-  ['modal-subject','modal-detail','modal-score'].forEach(id=>{
-    document.getElementById(id).addEventListener('click',e=>{if(e.target===document.getElementById(id))closeModal(id);});
-  });
+// ─────────────────── UTILS ───────────────────
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function fmt(ms){ const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60; return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`; }
+function fmtH(ms){ const h=(ms/3600000).toFixed(1); return `${h}h`; }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function t(){ return T[currentLang]; }
+function rt(){ return ROLES_T[currentLang][currentRole] || ROLES_T['en']['student']; }
+function rc(type='text'){
+  const m={student:'violet',developer:'blue',researcher:'emerald',freelancer:'amber',designer:'pink',teacher:'indigo',manager:'orange'};
+  const c=m[currentRole]||'violet';
+  if(type==='text') return `text-${c}-400`;
+  if(type==='bg')   return `bg-${c}-500/15`;
+  if(type==='border') return `border-${c}-500/30`;
+  return c;
 }
 
-document.addEventListener('DOMContentLoaded',()=>{
-  if(!checkLicense()){
-    // License screen already visible
+// ─────────────────── GRADE HELPERS ───────────────────
+function snapGrade(v){
+  return VALID_GRADES.reduce((a,b)=>Math.abs(b-v)<Math.abs(a-v)?b:a);
+}
+function gradeColor(g){
+  if(g<=1.3) return '#10b981';
+  if(g<=2.0) return '#22d3ee';
+  if(g<=2.7) return '#f59e0b';
+  if(g<=3.3) return '#f97316';
+  return '#ef4444';
+}
+function gradeLabel(g){
+  const lbs=t().gradeLabel||['Excellent','Very good','Good','Satisfactory','Sufficient','Insufficient'];
+  if(g<=1.3) return lbs[0];
+  if(g<=1.7) return lbs[1];
+  if(g<=2.3) return lbs[2];
+  if(g<=2.7) return lbs[3];
+  if(g<=3.3) return lbs[4];
+  return lbs[5];
+}
+
+// ─────────────────── ACCESS CONTROL ───────────────────
+function validateKey(raw){
+  const key=(raw||'').trim().toUpperCase();
+  return /^[0-9A-F]{8}-[0-9A-F]{8}-[0-9A-F]{8}-[0-9A-F]{8}$/.test(key);
+}
+function getAccessState(){
+  if(validateKey(localStorage.getItem('sgp_license')||'')) return 'licensed';
+  const ts=localStorage.getItem('sgp_trial_start');
+  if(ts) return Date.now()-parseInt(ts)<TRIAL_DAYS*86400000?'trial':'trial_expired';
+  return 'none';
+}
+function startTrial(){
+  localStorage.setItem('sgp_trial_start', Date.now().toString());
+  hideLicenseScreen();
+  openRoleScreen();
+}
+function activateLicense(){
+  const raw=document.getElementById('license-input').value;
+  if(!validateKey(raw)){ toast('Invalid license key','red'); return; }
+  localStorage.setItem('sgp_license', raw.trim().toUpperCase());
+  hideLicenseScreen();
+  currentRole=localStorage.getItem('sgp_role');
+  if(!currentRole){ openRoleScreen(); return; }
+  applyRoleTheme(currentRole);
+  document.getElementById('main-app').classList.remove('hidden');
+  initApp();
+  toast('License activated!');
+}
+function activateLockedLicense(){
+  const raw=document.getElementById('locked-license-input').value;
+  if(!validateKey(raw)){ toast('Invalid license key','red'); return; }
+  localStorage.setItem('sgp_license', raw.trim().toUpperCase());
+  document.getElementById('locked-screen').style.display='none';
+  currentRole=localStorage.getItem('sgp_role');
+  if(!currentRole){ openRoleScreen(); return; }
+  applyRoleTheme(currentRole);
+  document.getElementById('main-app').classList.remove('hidden');
+  initApp();
+  toast('License activated!');
+}
+function hideLicenseScreen(){ document.getElementById('license-screen').style.display='none'; }
+function showLockedScreen(){ document.getElementById('locked-screen').style.display='flex'; }
+
+// ─────────────────── TRIAL BANNER ───────────────────
+function updateTrialBanner(){
+  const state=getAccessState();
+  const banner=document.getElementById('trial-banner');
+  if(state==='trial'){
+    const ts=parseInt(localStorage.getItem('sgp_trial_start'));
+    const daysLeft=Math.max(1,Math.ceil((TRIAL_DAYS*86400000-(Date.now()-ts))/86400000));
+    document.getElementById('trial-days-left').textContent=daysLeft;
+    banner.classList.remove('hidden');
   } else {
-    initApp();
+    banner.classList.add('hidden');
   }
-});
-
-// ═══════════════════════════════════════════════════════
-// LANGUAGE
-// ═══════════════════════════════════════════════════════
-function setLang(lang){
-  currentLang=lang;DB.lang=lang;
-  document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
-  applyTranslations();setTab(currentTab);
 }
-function setText(id,key){const el=document.getElementById(id);if(el)el.textContent=t(key);}
-function setAttr(id,attr,val){const el=document.getElementById(id);if(el)el.setAttribute(attr,val);}
 
-function applyTranslations(){
-  const lang=currentLang;
-  document.title='Study Grade Predictor — App';
-  document.getElementById('btn-add-subject').textContent=t('btnAddSubject');
-  ['dashboard','subjects','analytics','predictions'].forEach((tab,i)=>{
-    const b=document.querySelector(`[data-tab="${tab}"]`);if(b)b.textContent=T[lang].tabs[i];
+// ─────────────────── ROLE ───────────────────
+function applyRoleTheme(role){
+  document.body.setAttribute('data-role',role);
+  currentRole=role;
+}
+function openRoleScreen(){
+  document.getElementById('main-app').classList.add('hidden');
+  document.getElementById('role-screen').style.display='flex';
+  renderRoleCards();
+}
+function renderRoleCards(){
+  const grid=document.getElementById('role-cards-grid');
+  const roles=Object.keys(ROLE_META);
+  const rT=ROLES_T[currentLang];
+  grid.innerHTML=roles.map(r=>{
+    const m=ROLE_META[r];
+    const d=rT[r];
+    return `<div class="role-card glass-card p-5 rounded-2xl text-center space-y-2 fade-in" 
+      style="border-color:${r===currentRole?m.color:'rgba(255,255,255,.06)'}"
+      onmouseenter="this.style.borderColor='${m.color}';this.style.boxShadow='0 0 24px ${m.color}33'"
+      onmouseleave="this.style.borderColor='${r===currentRole?m.color:'rgba(255,255,255,.06)'}';this.style.boxShadow=''"
+      onclick="selectRole('${r}')">
+      <div class="text-4xl">${m.icon}</div>
+      <p class="font-bold text-white text-sm">${d.name}</p>
+      <p class="text-xs text-slate-500 leading-relaxed">${d.desc}</p>
+    </div>`;
+  }).join('');
+}
+function selectRole(roleId){
+  localStorage.setItem('sgp_role',roleId);
+  applyRoleTheme(roleId);
+  document.getElementById('role-screen').style.display='none';
+  document.getElementById('main-app').classList.remove('hidden');
+  initApp();
+  toast('🎉 Welcome, '+ROLES_T[currentLang][roleId].name+'!');
+}
+
+// ─────────────────── INIT ───────────────────
+function initApp(){
+  updateTrialBanner();
+  // Nav date
+  const nd=document.getElementById('nav-date');
+  if(nd) nd.textContent=new Date().toLocaleDateString(currentLang==='fr'?'fr-FR':currentLang==='de'?'de-DE':'en-US',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  // Nav role display
+  const ri=document.getElementById('nav-role-icon');
+  const rn=document.getElementById('nav-role-name');
+  if(ri) ri.textContent=ROLE_META[currentRole]?.icon||'';
+  if(rn) rn.textContent=ROLES_T[currentLang][currentRole]?.name||'';
+  // Lang buttons
+  ['fr','en','de'].forEach(l=>{
+    const btn=document.getElementById('lang-'+l);
+    if(btn){ btn.style.color=l===currentLang?'var(--accent)':''; btn.style.fontWeight=l===currentLang?'700':''; }
   });
-  document.getElementById('nav-date').textContent=new Date().toLocaleDateString(
-    lang==='de'?'de-DE':lang==='en'?'en-US':'fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}
-  );
-  ['lbl-active-session','activeSession','lbl-no-session','noSession','lbl-select-hint','selectHint',
-   'lbl-start-session','startSession','lbl-mode','modeLabel','lbl-goal','goalLabel',
-   'btn-start-session','btnStart','lbl-recent','recent','lbl-no-subjects','noSubjects',
-   'lbl-add-hint','addHint','btn-add-first','btnAddFirst','lbl-chart-time','chartTime',
-   'lbl-chart-grade','chartGrade','lbl-chart-weekly','chartWeekly','lbl-no-pred','noPred',
-   'lbl-no-pred-hint','noPredHint','modal-sub-title','modalSubTitle','lbl-sub-name','subName',
-   'lbl-sub-cat','subCat','lbl-sub-diff','subDiff','lbl-sub-hours','subHours','lbl-sub-exam','subExam',
-   'lbl-grade-info','gradeInfo','lbl-sub-desc','subDesc','btn-cancel-sub','cancel','btn-save-sub','create',
-   'modal-score-title','scoreTitle','lbl-score-type','scoreType','lbl-score-val','scoreVal',
-   'lbl-score-comment','scoreComment','btn-cancel-score','cancel','btn-save-score','save'
-  ].reduce((acc,v,i,arr)=>i%2===0?[...acc,[v,arr[i+1]]]:acc,[]).forEach(([id,key])=>setText(id,key));
-
-  setAttr('sub-name','placeholder',t('subNamePh'));
-  setAttr('sub-desc','placeholder',t('subDescPh'));
-  setAttr('score-comment','placeholder',t('scoreCommentPh'));
-
-  populateSessionSubjectSelect();
-  const modeEl=document.getElementById('session-mode'),curMode=modeEl.value;
-  modeEl.innerHTML=t('modeKeys').map((k,i)=>`<option value="${k}" ${k===curMode?'selected':''}>${t('modes')[i]}</option>`).join('');
-  const stEl=document.getElementById('score-type'),curSt=stEl.value;
-  stEl.innerHTML=t('scoreTypeKeys').map((k,i)=>`<option value="${k}" ${k===curSt?'selected':''}>${t('scoreTypes')[i]}</option>`).join('');
-  const catEl=document.getElementById('sub-category'),curCat=catEl.value;
-  catEl.innerHTML=t('cats').map(c=>`<option ${c===curCat?'selected':''}>${c}</option>`).join('');
-  const diffEl=document.getElementById('sub-difficulty'),curDiff=diffEl.value;
-  diffEl.innerHTML=t('diffs').map((d,i)=>`<option value="${i+1}" ${(i+1)===parseInt(curDiff)?'selected':''}>${d}</option>`).join('');
-  if(!curDiff)diffEl.value='2';
+  applyTranslations();
+  setTab(currentTab);
 }
 
-// ═══════════════════════════════════════════════════════
-// TABS
-// ═══════════════════════════════════════════════════════
-function setTab(tab){
-  currentTab=tab;
-  document.querySelectorAll('.tab-content').forEach(el=>el.classList.add('hidden'));
-  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('tab-active'));
-  document.getElementById(`tab-${tab}`)?.classList.remove('hidden');
-  document.querySelector(`[data-tab="${tab}"]`)?.classList.add('tab-active');
-  if(tab==='dashboard')renderDashboard();
-  if(tab==='subjects')renderSubjects();
-  if(tab==='analytics')renderAnalytics();
-  if(tab==='predictions')renderPredictions();
+// ─────────────────── TRANSLATIONS ───────────────────
+function applyTranslations(){
+  const T_=t();
+  // Generic data-t
+  document.querySelectorAll('[data-t]').forEach(el=>{
+    const key=el.getAttribute('data-t');
+    if(key.startsWith('stats')){
+      const i=parseInt(key.replace('stats',''));
+      if(T_.stats[i]!==undefined) el.textContent=T_.stats[i];
+    } else if(T_[key]!==undefined){
+      el.textContent=T_[key];
+    }
+  });
+  // Tabs
+  document.getElementById('tab-0').textContent=T_.tabs[0];
+  document.getElementById('tab-1').textContent=rt().itemsTab;
+  document.getElementById('tab-2').textContent=T_.tabs[2];
+  document.getElementById('tab-3').textContent=T_.tabs[3];
+  // Role-specific
+  const btnAddLabel=document.getElementById('btn-add-label');
+  if(btnAddLabel) btnAddLabel.textContent=rt().addBtn;
+  const lblNo=document.getElementById('lbl-no-subjects');
+  if(lblNo) lblNo.textContent=rt().noItems;
+  const lblHint=document.getElementById('lbl-add-hint');
+  if(lblHint) lblHint.textContent=rt().addHint;
+  const btnFirst=document.getElementById('btn-add-first');
+  if(btnFirst) btnFirst.textContent=rt().addFirst;
+  const modalTitle=document.getElementById('modal-sub-title');
+  if(modalTitle) modalTitle.textContent=rt().addModal;
+  const lblName=document.getElementById('lbl-sub-name');
+  if(lblName) lblName.textContent=rt().itemNameLabel;
+  const subNameInp=document.getElementById('sub-name');
+  if(subNameInp) subNameInp.placeholder=rt().itemNamePh;
+  const lblExam=document.getElementById('lbl-sub-exam');
+  if(lblExam) lblExam.textContent=rt().deadlineLabel;
+  const lblHours=document.getElementById('lbl-sub-hours');
+  if(lblHours) lblHours.textContent=rt().targetLabel;
+  const lblInfo=document.getElementById('lbl-grade-info');
+  if(lblInfo) lblInfo.textContent=rt().predInfoLabel;
+  const lblChartGrade=document.getElementById('lbl-chart-grade');
+  if(lblChartGrade) lblChartGrade.textContent=rt().chartGradeLabel;
+  // Nav role name
+  const rnEl=document.getElementById('nav-role-name');
+  if(rnEl) rnEl.textContent=rt().name;
+  // Session mode select
+  const modeSelect=document.getElementById('session-mode');
+  if(modeSelect){
+    const saved=modeSelect.value;
+    modeSelect.innerHTML=rt().modes.map((m,i)=>`<option value="${rt().modeKeys[i]}">${m}</option>`).join('');
+    if(saved) modeSelect.value=saved;
+  }
+  // Score type select
+  const stSelect=document.getElementById('score-type');
+  if(stSelect){
+    stSelect.innerHTML=rt().scoreTypes.map((s,i)=>`<option value="${rt().scoreTypeKeys[i]}">${s}</option>`).join('');
+  }
+  // Category select
+  const catSelect=document.getElementById('sub-category');
+  if(catSelect){
+    catSelect.innerHTML=rt().cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  }
+  // Difficulty select
+  const diffSelect=document.getElementById('sub-difficulty');
+  if(diffSelect){
+    diffSelect.innerHTML=rt().diffs.map(d=>`<option value="${d}">${d}</option>`).join('');
+  }
 }
 
-// ═══════════════════════════════════════════════════════
-// HERO STATS
-// ═══════════════════════════════════════════════════════
-function renderHeroStats(){
-  const sessions=DB.sessions,scores=DB.scores,labels=T[currentLang].stats;
-  const totalSec=sessions.reduce((a,s)=>a+(s.duration||0),0);
-  const avgScore=scores.length?Math.round(scores.reduce((a,s)=>a+s.value,0)/scores.length):0;
-  const todaySec=sessions.filter(s=>s.date===todayStr()).reduce((a,s)=>a+(s.duration||0),0);
-  const stats=[
-    {label:labels[0],value:DB.subjects.length,color:'violet',icon:'📚',border:'border-violet'},
-    {label:labels[1],value:fmtH(totalSec),color:'cyan',icon:'⏱️',border:'border-cyan'},
-    {label:labels[2],value:avgScore+'%',color:'emerald',icon:'🎯',border:'border-emerald'},
-    {label:labels[3],value:fmtH(todaySec),color:'amber',icon:'🔥',border:'border-amber'},
-  ];
-  document.getElementById('hero-stats').innerHTML=stats.map(s=>`
-    <div class="glass stat-card ${s.border} rounded-xl p-3 sm:p-4 glass-hover cursor-default">
-      <div class="flex items-start justify-between">
-        <div><div class="text-xs text-slate-500 font-medium uppercase tracking-wider">${s.label}</div>
-        <div class="text-xl sm:text-2xl font-bold mt-1 text-${s.color}-400">${s.value}</div></div>
-        <span class="text-xl sm:text-2xl">${s.icon}</span>
+// ─────────────────── SET LANG ───────────────────
+function setLang(lang){
+  currentLang=lang;
+  localStorage.setItem('sgp_lang',lang);
+  initApp();
+  renderCurrentTab();
+}
+
+// ─────────────────── SET TAB ───────────────────
+function setTab(i){
+  currentTab=i;
+  document.querySelectorAll('.tab-btn').forEach((b,idx)=>{
+    b.classList.toggle('tab-active',idx===i);
+  });
+  document.querySelectorAll('[id^="content-"]').forEach(el=>el.classList.add('hidden'));
+  const c=document.getElementById('content-'+i);
+  if(c){ c.classList.remove('hidden'); c.classList.add('fade-in'); }
+  renderCurrentTab();
+}
+function renderCurrentTab(){
+  if(currentTab===0) renderDashboard();
+  if(currentTab===1) renderSubjects();
+  if(currentTab===2) renderAnalytics();
+  if(currentTab===3) renderPredictions();
+}
+
+// ─────────────────── PREDICT ───────────────────
+function sigmoid(x){ return 1/(1+Math.exp(-x)); }
+function computeProgress(sub){
+  const sess=DB.sess().filter(s=>s.subId===sub.id);
+  const totalMs=sess.reduce((a,s)=>a+s.duration,0);
+  const targetMs=(sub.targetHours||40)*3600000;
+  return Math.min(totalMs/targetMs,1.5);
+}
+function predict(sub){
+  const sess=DB.sess().filter(s=>s.subId===sub.id);
+  if(sess.length===0) return {grade:3.0,passProb:50,confidence:'low',factors:{time:0,score:0,consist:0}};
+  const totalMs=sess.reduce((a,s)=>a+s.duration,0);
+  const targetMs=(sub.targetHours||40)*3600000;
+  const timeCov=Math.min(totalMs/targetMs,1);
+  const scores=sess.filter(s=>s.score!=null).map(s=>s.score);
+  const avgScore=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:50;
+  const scoreFac=avgScore/100;
+  // Consistency: sessions spread over days
+  const days=[...new Set(sess.map(s=>new Date(s.startTs).toDateString()))].length;
+  const consist=Math.min(days/14,1);
+  // Deadline factor
+  let deadlineFac=0.5;
+  if(sub.examDate){
+    const daysLeft=(new Date(sub.examDate)-Date.now())/86400000;
+    deadlineFac=daysLeft<0?0:daysLeft>60?1:daysLeft/60;
+  }
+  const composite=timeCov*0.35+scoreFac*0.40+consist*0.15+deadlineFac*0.10;
+  // Grade (1-4 scale)
+  const rawGrade=4-(composite*3);
+  const grade=snapGrade(Math.max(1,Math.min(4,rawGrade)));
+  // Pass prob
+  const z=(composite-0.5)*8;
+  const passProb=Math.round(sigmoid(z)*100);
+  // Confidence
+  const confidence=sess.length>=6&&scores.length>=3?'high':sess.length>=3||scores.length>=2?'medium':'low';
+  return {grade,passProb,confidence,factors:{time:Math.round(timeCov*100),score:Math.round(scoreFac*100),consist:Math.round(consist*100)}};
+}
+function predictDisplay(sub){
+  const p=predict(sub);
+  if(rt().predType==='grade') return {...p,displayType:'grade'};
+  return {...p,displayType:'percent',score:p.passProb,success:p.passProb>=70};
+}
+
+// ─────────────────── MODALS ───────────────────
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+function openAddModal(){
+  applyTranslations();
+  document.getElementById('sub-name').value='';
+  document.getElementById('sub-exam').value='';
+  document.getElementById('sub-hours').value='40';
+  document.getElementById('add-modal').classList.remove('hidden');
+}
+
+// ─────────────────── SAVE SUBJECT ───────────────────
+function saveSubject(e){
+  e.preventDefault();
+  const name=document.getElementById('sub-name').value.trim();
+  if(!name){ toast(t().toastEnterName,'red'); return; }
+  const subs=DB.subs();
+  subs.push({
+    id:uid(),
+    name,
+    category:document.getElementById('sub-category').value,
+    difficulty:document.getElementById('sub-difficulty').value,
+    examDate:document.getElementById('sub-exam').value||null,
+    targetHours:parseFloat(document.getElementById('sub-hours').value)||40,
+    createdAt:Date.now()
+  });
+  DB.saveSubs(subs);
+  closeModal('add-modal');
+  toast(t().toastAdded);
+  renderSubjects();
+  renderDashboard();
+}
+
+// ─────────────────── DELETE SUBJECT ───────────────────
+function deleteSubject(){
+  if(!activeSubjectId) return;
+  if(!confirm(t().deleteConfirm)) return;
+  DB.saveSubs(DB.subs().filter(s=>s.id!==activeSubjectId));
+  DB.saveSess(DB.sess().filter(s=>s.subId!==activeSubjectId));
+  closeModal('detail-modal');
+  toast(t().toastDeleted);
+  activeSubjectId=null;
+  renderSubjects();
+  renderDashboard();
+}
+
+// ─────────────────── OPEN DETAIL ───────────────────
+function openDetail(subId){
+  activeSubjectId=subId;
+  const sub=DB.subs().find(s=>s.id===subId);
+  if(!sub) return;
+  // Fill modal
+  document.getElementById('detail-title').textContent=sub.name;
+  // Progress
+  const sess=DB.sess().filter(s=>s.subId===subId);
+  const totalMs=sess.reduce((a,s)=>a+s.duration,0);
+  const targetMs=(sub.targetHours||40)*3600000;
+  const pct=Math.min(Math.round(totalMs/targetMs*100),100);
+  document.getElementById('detail-pct').textContent=pct+'%';
+  document.getElementById('detail-progress-bar').style.width=pct+'%';
+  // Stats
+  document.getElementById('detail-time').textContent=fmtH(totalMs);
+  const scores=sess.filter(s=>s.score!=null).map(s=>s.score);
+  document.getElementById('detail-avg').textContent=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length)+'%':'—';
+  document.getElementById('detail-sessions').textContent=sess.length;
+  // Mode select
+  applyTranslations();
+  // Scores list
+  const scoresList=document.getElementById('detail-scores-list');
+  scoresList.innerHTML=sess.filter(s=>s.score!=null).slice(-5).reverse().map(s=>`
+    <div class="flex items-center justify-between py-2 border-b border-white/5">
+      <div>
+        <span class="text-xs text-slate-400">${s.type||'Score'}</span>
+        ${s.comment?`<span class="text-xs text-slate-600 ml-2">${s.comment}</span>`:''}
       </div>
-    </div>`).join('');
+      <span class="font-bold text-sm" style="color:${s.score>=70?'#10b981':s.score>=50?'#f59e0b':'#ef4444'}">${s.score}%</span>
+    </div>
+  `).join('') || `<p class="text-xs text-slate-600 py-2">${t().noSessions}</p>`;
+  document.getElementById('detail-modal').classList.remove('hidden');
 }
 
-// ═══════════════════════════════════════════════════════
-// DASHBOARD
-// ═══════════════════════════════════════════════════════
-function renderDashboard(){
-  renderHeroStats();applyTranslations();
-  populateSessionSubjectSelect();renderRecentSessions();
-  if(activeSession)renderActiveSessionPanel();
+// ─────────────────── SCORE MODAL ───────────────────
+function openScoreModal(){
+  applyTranslations();
+  document.getElementById('score-val').value='';
+  document.getElementById('score-comment').value='';
+  document.getElementById('score-modal').classList.remove('hidden');
 }
-function populateSessionSubjectSelect(){
-  const sel=document.getElementById('session-subject'),cur=sel.value;
-  sel.innerHTML=`<option value="">${t('chooseSubPh')}</option>`+
-    DB.subjects.map(s=>`<option value="${s.id}" ${s.id===cur?'selected':''}>${s.name}</option>`).join('');
+function saveScore(e){
+  e.preventDefault();
+  if(!activeSubjectId) return;
+  const val=parseFloat(document.getElementById('score-val').value);
+  if(isNaN(val)||val<0||val>100){ toast('Score must be 0-100','red'); return; }
+  const comment=document.getElementById('score-comment').value.trim();
+  const type=document.getElementById('score-type').value;
+  const sess=DB.sess();
+  sess.push({
+    id:uid(),
+    subId:activeSubjectId,
+    startTs:Date.now(),
+    duration:0,
+    score:val,
+    comment,
+    type,
+    mode:'score',
+    isScoreOnly:true
+  });
+  DB.saveSess(sess);
+  closeModal('score-modal');
+  toast(t().toastScore);
+  openDetail(activeSubjectId);
+  renderPredictions();
+  renderDashboard();
+}
+
+// ─────────────────── SESSION ───────────────────
+let _stopSubId=null;
+function startSession(){
+  if(sessionInterval){ toast(t().sessionRunning,'amber'); return; }
+  if(!activeSubjectId){ toast(t().chooseSubject,'amber'); return; }
+  const sub=DB.subs().find(s=>s.id===activeSubjectId);
+  if(!sub) return;
+  const mode=document.getElementById('session-mode').value;
+  const goal=parseInt(document.getElementById('session-goal').value)||30;
+  sessionStartTs=Date.now();
+  _stopSubId=activeSubjectId;
+  closeModal('detail-modal');
+  // Create pending session
+  const sess=DB.sess();
+  const sId=uid();
+  sess.push({id:sId,subId:activeSubjectId,startTs:sessionStartTs,duration:0,mode,goalMin:goal,score:null});
+  DB.saveSess(sess);
+  activeSessionId=sId;
+  renderActiveSessionPanel(sub);
+  sessionInterval=setInterval(()=>tickSession(sub,sId),1000);
+  toast(t().toastStarted);
+  renderDashboard();
+}
+function tickSession(sub,sId){
+  const elapsed=Date.now()-sessionStartTs;
+  document.getElementById('session-timer').textContent=fmt(elapsed);
+  // Update duration live
+  const sess=DB.sess();
+  const idx=sess.findIndex(s=>s.id===sId);
+  if(idx>=0){ sess[idx].duration=elapsed; DB.saveSess(sess); }
+}
+function renderActiveSessionPanel(sub){
+  const panel=document.getElementById('active-session-panel');
+  const noSess=document.getElementById('no-active-session');
+  if(sub){
+    panel.classList.remove('hidden');
+    noSess.classList.add('hidden');
+    document.getElementById('session-subject-name').textContent=sub.name;
+    document.getElementById('session-timer').textContent='00:00:00';
+    const modeEl=document.getElementById('session-mode-display');
+    if(modeEl){
+      const modeKey=DB.sess().find(s=>s.id===activeSessionId)?.mode||'';
+      const modeIdx=rt().modeKeys.indexOf(modeKey);
+      modeEl.textContent=modeIdx>=0?rt().modes[modeIdx]:modeKey;
+    }
+  } else {
+    panel.classList.add('hidden');
+    noSess.classList.remove('hidden');
+  }
+}
+function stopSession(){
+  if(!sessionInterval) return;
+  document.getElementById('stop-score').value=70;
+  document.getElementById('stop-modal').classList.remove('hidden');
+}
+function confirmStop(){
+  clearInterval(sessionInterval);
+  sessionInterval=null;
+  const score=parseFloat(document.getElementById('stop-score').value)||null;
+  const sess=DB.sess();
+  const idx=sess.findIndex(s=>s.id===activeSessionId);
+  if(idx>=0){
+    sess[idx].duration=Date.now()-sessionStartTs;
+    sess[idx].score=score;
+    DB.saveSess(sess);
+  }
+  activeSessionId=null;
+  sessionStartTs=null;
+  closeModal('stop-modal');
+  renderActiveSessionPanel(null);
+  toast(t().toastSaved);
+  renderDashboard();
+  renderPredictions();
+}
+
+// ─────────────────── DASHBOARD ───────────────────
+function renderDashboard(){
+  const sess=DB.sess().filter(s=>!s.isScoreOnly);
+  const subs=DB.subs();
+  document.getElementById('stat-total').textContent=subs.length;
+  const today=todayStr();
+  document.getElementById('stat-today').textContent=sess.filter(s=>new Date(s.startTs).toISOString().slice(0,10)===today).length;
+  // Hours this week
+  const weekAgo=Date.now()-7*86400000;
+  const weekMs=sess.filter(s=>s.startTs>weekAgo).reduce((a,s)=>a+s.duration,0);
+  document.getElementById('stat-week').textContent=(weekMs/3600000).toFixed(1)+'h';
+  // Avg score
+  const allScores=DB.sess().filter(s=>s.score!=null).map(s=>s.score);
+  document.getElementById('stat-avg').textContent=allScores.length?Math.round(allScores.reduce((a,b)=>a+b,0)/allScores.length)+'%':'—';
+  renderRecentSessions();
 }
 function renderRecentSessions(){
-  const sessions=DB.sessions.slice().reverse().slice(0,8),subjects=DB.subjects;
-  const el=document.getElementById('recent-sessions');
-  if(!sessions.length){el.innerHTML=`<div class="text-slate-600 text-sm text-center py-4">${t('noSessions')}</div>`;return;}
-  const modeMap={};t('modeKeys').forEach((k,i)=>modeMap[k]=t('modes')[i]);
-  el.innerHTML=sessions.map(s=>{
-    const sub=subjects.find(x=>x.id===s.subjectId);
-    return `<div class="glass glass-hover rounded-xl px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg gradient-btn flex items-center justify-center text-xs font-bold text-white shrink-0">${sub?sub.name[0].toUpperCase():'?'}</div>
-        <div><div class="text-sm font-medium text-slate-200">${sub?sub.name:t('deletedSub')}</div>
-        <div class="text-xs text-slate-500">${modeMap[s.mode]||s.mode} · ${s.date}</div></div>
+  const sess=DB.sess().filter(s=>!s.isScoreOnly).slice(-8).reverse();
+  const subs=DB.subs();
+  const list=document.getElementById('recent-sessions-list');
+  const noMsg=document.getElementById('no-sessions-msg');
+  if(!sess.length){
+    list.innerHTML='';
+    noMsg.classList.remove('hidden');
+    return;
+  }
+  noMsg.classList.add('hidden');
+  list.innerHTML=sess.map(s=>{
+    const sub=subs.find(x=>x.id===s.subId);
+    const modeIdx=rt().modeKeys.indexOf(s.mode);
+    const modeName=modeIdx>=0?rt().modes[modeIdx]:s.mode||'';
+    return `<div class="flex items-center justify-between py-2 border-b border-white/5">
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-slate-200 truncate">${sub?sub.name:'—'}</p>
+        <p class="text-xs text-slate-500">${modeName} · ${new Date(s.startTs).toLocaleDateString()}</p>
       </div>
-      <div class="text-right shrink-0 ml-2"><div class="text-sm font-semibold text-violet-400">${fmt(s.duration||0)}</div></div>
+      <div class="flex items-center gap-3 ml-3">
+        <span class="text-xs text-slate-400">${fmtH(s.duration)}</span>
+        ${s.score!=null?`<span class="text-xs font-bold" style="color:${s.score>=70?'#10b981':s.score>=50?'#f59e0b':'#ef4444'}">${s.score}%</span>`:''}
+      </div>
     </div>`;
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════
-// SESSION TIMER
-// ═══════════════════════════════════════════════════════
-function startSession(){
-  if(activeSession){toast(t('sessionRunning'),'amber');return;}
-  const subId=document.getElementById('session-subject').value;
-  const mode=document.getElementById('session-mode').value;
-  const goal=parseInt(document.getElementById('session-goal').value)||60;
-  if(!subId){toast(t('chooseSubject'),'amber');return;}
-  const sub=DB.subjects.find(s=>s.id===subId);
-  activeSession={id:uid(),subjectId:subId,subjectName:sub.name,mode,goal:goal*60,start:Date.now(),elapsed:0,date:todayStr()};
-  timerInterval=setInterval(tickSession,1000);
-  renderActiveSessionPanel();toast(t('toastStarted'));
-}
-function tickSession(){
-  if(!activeSession)return;
-  activeSession.elapsed=Math.floor((Date.now()-activeSession.start)/1000);
-  renderActiveSessionPanel();
-}
-function stopSession(withScore){
-  if(!activeSession)return;
-  clearInterval(timerInterval);timerInterval=null;
-  const session={...activeSession,duration:activeSession.elapsed};
-  const sessions=DB.sessions;sessions.push(session);DB.sessions=sessions;
-  const sid=activeSession.subjectId;activeSession=null;
-  document.getElementById('active-session-panel').innerHTML=
-    `<div class="text-slate-500 text-sm">${t('noSession')}</div><div class="text-slate-600 text-xs mt-1">${t('selectHint')}</div>`;
-  renderHeroStats();renderRecentSessions();
-  if(currentTab==='subjects')renderSubjects();
-  if(currentTab==='predictions')renderPredictions();
-  if(currentTab==='analytics')renderAnalytics();
-  toast(t('toastSaved'),'emerald');
-  if(withScore)openScoreModal(sid);
-}
-function renderActiveSessionPanel(){
-  if(!activeSession)return;
-  const el=document.getElementById('active-session-panel');
-  const pct=Math.min(100,Math.round((activeSession.elapsed/activeSession.goal)*100));
-  const remaining=Math.max(0,activeSession.goal-activeSession.elapsed);
-  const modeMap={};t('modeKeys').forEach((k,i)=>modeMap[k]=t('modes')[i]);
-  el.innerHTML=`<div class="w-full">
-    <div class="flex items-center gap-2 mb-3 flex-wrap">
-      <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot inline-block"></span>
-      <span class="font-semibold text-slate-200">${activeSession.subjectName}</span>
-      <span class="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full">${modeMap[activeSession.mode]||activeSession.mode}</span>
-    </div>
-    <div class="text-3xl sm:text-4xl font-bold text-violet-400 mb-2 font-mono">${fmt(activeSession.elapsed)}</div>
-    <div class="text-xs text-slate-500 mb-3">${t('objective')}: ${fmt(activeSession.goal)} · ${t('remaining')}: ${fmt(remaining)}</div>
-    <div class="w-full bg-slate-800 rounded-full h-2 mb-4"><div class="progress-bar h-2 rounded-full" style="width:${pct}%"></div></div>
-    <div class="flex gap-2">
-      <button onclick="stopSession(false)" class="flex-1 py-2 rounded-lg border border-slate-700 text-slate-400 text-sm hover:border-red-500/50 hover:text-red-400 transition">${t('stop')}</button>
-      <button onclick="stopSession(true)" class="flex-1 gradient-btn py-2 rounded-lg text-white text-sm font-medium">${t('stopScore')}</button>
-    </div>
-  </div>`;
-}
-
-// ═══════════════════════════════════════════════════════
-// PROGRESS (composite: 60% time + 40% score)
-// ═══════════════════════════════════════════════════════
-function computeProgress(sub){
-  const sessions=DB.sessions.filter(s=>s.subjectId===sub.id);
-  const scores=DB.scores.filter(s=>s.subjectId===sub.id);
-  const totalSec=sessions.reduce((a,s)=>a+(s.duration||0),0);
-  const timePct=Math.min(1,totalSec/3600/(sub.targetHours||80));
-  const scorePct=scores.length?scores.reduce((a,s)=>a+s.value,0)/scores.length/100:0;
-  const composite=scores.length?timePct*0.6+scorePct*0.4:timePct;
-  return{pct:Math.round(composite*100),totalSec};
-}
-
-// ═══════════════════════════════════════════════════════
-// SUBJECTS
-// ═══════════════════════════════════════════════════════
+// ─────────────────── SUBJECTS LIST ───────────────────
 function renderSubjects(){
-  const subjects=DB.subjects,grid=document.getElementById('subjects-grid'),empty=document.getElementById('subjects-empty');
-  if(!subjects.length){grid.innerHTML='';empty.classList.remove('hidden');return;}
-  empty.classList.add('hidden');
-  grid.innerHTML=subjects.map(sub=>{
-    const{pct,totalSec}=computeProgress(sub);
-    const scores=DB.scores.filter(s=>s.subjectId===sub.id);
-    const avgScore=scores.length?Math.round(scores.reduce((a,s)=>a+s.value,0)/scores.length):null;
-    const daysLeft=sub.examDate?Math.ceil((new Date(sub.examDate)-new Date())/86400000):null;
-    const pred=predict(sub),gc=gradeColor(pred.grade);
-    return`<div class="glass glass-hover rounded-xl p-4 flex flex-col gap-3 cursor-pointer" onclick="openDetail('${sub.id}')">
-      <div class="flex items-start justify-between">
-        <div><div class="font-semibold text-slate-200">${sub.name}</div>
-        <div class="text-xs text-slate-500 mt-0.5">${sub.category} · ${t('diffs')[sub.difficulty-1]||''}</div></div>
-        ${daysLeft!==null?`<span class="text-xs px-2 py-0.5 rounded-full shrink-0 ml-2 ${daysLeft<7?'bg-red-500/20 text-red-400':daysLeft<30?'bg-amber-500/20 text-amber-400':'bg-slate-700 text-slate-400'}">${daysLeft}${t('daysLeft')}</span>`:''}
+  const subs=DB.subs();
+  const list=document.getElementById('subjects-list');
+  const noMsg=document.getElementById('no-subjects-msg');
+  if(!subs.length){
+    list.innerHTML='';
+    noMsg.classList.remove('hidden');
+    return;
+  }
+  noMsg.classList.add('hidden');
+  list.innerHTML=subs.map(sub=>{
+    const sess=DB.sess().filter(s=>s.subId===sub.id);
+    const totalMs=sess.reduce((a,s)=>a+s.duration,0);
+    const targetMs=(sub.targetHours||40)*3600000;
+    const pct=Math.min(Math.round(totalMs/targetMs*100),100);
+    const pd=predictDisplay(sub);
+    // Third column display
+    let predCol='';
+    if(pd.displayType==='grade'){
+      const gc=gradeColor(pd.grade);
+      predCol=`<span class="text-lg font-black" style="color:${gc}">${pd.grade.toFixed(1)}</span>`;
+    } else {
+      const sc=pd.score>=70?'#10b981':pd.score>=50?'#f59e0b':'#ef4444';
+      predCol=`<span class="text-lg font-black" style="color:${sc}">${pd.score}%</span>`;
+    }
+    const daysLeft=sub.examDate?Math.ceil((new Date(sub.examDate)-Date.now())/86400000):null;
+    return `<div class="glass-card p-5 cursor-pointer hover:border-white/15 transition-all fade-in" onclick="openDetail('${sub.id}')">
+      <div class="flex items-start justify-between mb-3">
+        <div class="flex-1 min-w-0">
+          <h3 class="font-semibold text-white text-base truncate">${sub.name}</h3>
+          <p class="text-xs text-slate-500 mt-0.5">${sub.category||''} · ${sub.difficulty||''}</p>
+        </div>
+        ${daysLeft!==null?`<span class="text-xs text-slate-500 ml-3 flex-shrink-0">${daysLeft>0?daysLeft+' '+t().daysLeft:'Today!'}</span>`:''}
       </div>
-      <div>
-        <div class="flex justify-between text-xs text-slate-500 mb-1"><span>${t('progress')}</span><span class="text-violet-400 font-medium">${pct}%</span></div>
-        <div class="w-full bg-slate-800 rounded-full h-1.5"><div class="progress-bar h-1.5 rounded-full" style="width:${pct}%"></div></div>
+      <div class="h-1.5 rounded-full bg-white/5 overflow-hidden mb-3">
+        <div class="progress-bar h-1.5" style="width:${pct}%"></div>
       </div>
       <div class="grid grid-cols-3 gap-2 text-center">
-        <div class="bg-slate-800/60 rounded-lg py-2"><div class="text-sm font-bold text-cyan-400">${fmtH(totalSec)}</div><div class="text-xs text-slate-600">${t('time')}</div></div>
-        <div class="bg-slate-800/60 rounded-lg py-2"><div class="text-sm font-bold text-violet-400">${avgScore!=null?avgScore+'%':'—'}</div><div class="text-xs text-slate-600">${t('avgScore')}</div></div>
-        <div class="bg-slate-800/60 rounded-lg py-2"><div class="text-sm font-bold text-${gc}-400">${pred.grade.toFixed(1)}</div><div class="text-xs text-slate-600">${t('predictedGrade')}</div></div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ═══════════════════════════════════════════════════════
-// PREDICTION ENGINE
-// ═══════════════════════════════════════════════════════
-function predict(sub){
-  const sessions=DB.sessions.filter(s=>s.subjectId===sub.id);
-  const scores=DB.scores.filter(s=>s.subjectId===sub.id);
-  const totalSec=sessions.reduce((a,s)=>a+(s.duration||0),0);
-  const timeFactor=Math.min(1,totalSec/3600/(sub.targetHours||80));
-  const avgScore=scores.length?scores.reduce((a,s)=>a+s.value,0)/scores.length/100:0.5;
-  let trend=0;
-  if(scores.length>=2){
-    const rec=scores.slice(-3).reduce((a,s)=>a+s.value,0)/Math.min(3,scores.length);
-    const old=scores.slice(0,-3).reduce((a,s)=>a+s.value,0)/Math.max(1,scores.length-3);
-    trend=(rec-old)/100;
-  }
-  const firstDate=sessions.length?Math.min(...sessions.map(s=>new Date(s.date).getTime())):Date.now();
-  const weeksElapsed=Math.max(1,(Date.now()-firstDate)/(7*24*3600*1000));
-  const consistFactor=Math.min(1,(sessions.length/weeksElapsed)/5);
-  const diffPenalty=[0,0,0.05,0.12,0.22][sub.difficulty||2];
-  let timePressure=0;
-  if(sub.examDate){
-    const dLeft=Math.ceil((new Date(sub.examDate)-new Date())/86400000);
-    const totDays=Math.max(1,Math.ceil((new Date(sub.examDate)-new Date(sub.createdAt||0))/86400000));
-    timePressure=Math.max(0,1-timeFactor)*Math.max(0,1-(dLeft/totDays));
-  }
-  const perf=Math.max(0,Math.min(1,timeFactor*0.35+avgScore*0.40+consistFactor*0.15+trend*0.10-diffPenalty-timePressure*0.1));
-  const grade=snapGrade(1.0+(1-perf)*4.0);
-  const passProb=Math.round(sigmoid(perf,0.5,8)*100);
-  const willPass=grade<=4.0&&passProb>=50;
-  const confLow=t('confLow');
-  const confidence=scores.length>=3&&sessions.length>=5?t('confHigh'):scores.length>=1||sessions.length>=2?t('confMed'):confLow;
-  return{passProb,grade,willPass,confidence,confLow,timeFactor,avgScore:Math.round(avgScore*100),consistFactor};
-}
-function sigmoid(x,mid,k){return 1/(1+Math.exp(-k*(x-mid)));}
-
-// ═══════════════════════════════════════════════════════
-// PREDICTIONS
-// ═══════════════════════════════════════════════════════
-function renderPredictions(){
-  const subjects=DB.subjects,grid=document.getElementById('predictions-grid'),empty=document.getElementById('predictions-empty');
-  if(!subjects.length){grid.innerHTML='';empty.classList.remove('hidden');return;}
-  empty.classList.add('hidden');
-  grid.innerHTML=subjects.map(sub=>{
-    const pred=predict(sub),gc=gradeColor(pred.grade);
-    const probColor=pred.passProb>=70?'emerald':pred.passProb>=50?'amber':'red';
-    const circleColor=pred.willPass?'#10b981':'#ef4444';
-    const daysLeft=sub.examDate?Math.ceil((new Date(sub.examDate)-new Date())/86400000):null;
-    const gLabel=gradeLabel(pred.grade,currentLang);
-    const barFill=Math.max(0,Math.round((5.0-pred.grade)/4.0*100));
-    return`<div class="glass rounded-xl p-4 sm:p-5 flex flex-col gap-4">
-      <div><div class="font-semibold text-slate-200">${sub.name}</div>
-      <div class="text-xs text-slate-500">${sub.category} · ${t('passThreshold')}${daysLeft!==null?' · '+daysLeft+' '+t('daysLeft'):''}</div></div>
-      <div class="flex items-center justify-center">
-        <div class="relative w-24 h-24 sm:w-28 sm:h-28">
-          <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
-            <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
-            <circle cx="50" cy="50" r="40" fill="none" stroke="${circleColor}" stroke-width="10"
-              stroke-dasharray="${pred.passProb*2.513} 251.3" stroke-linecap="round" style="transition:stroke-dasharray .8s ease"/>
-          </svg>
-          <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <div class="text-lg sm:text-xl font-bold text-${probColor}-400">${pred.passProb}%</div>
-            <div class="text-xs text-slate-500">${t('chance')}</div>
-          </div>
+        <div>
+          <p class="text-xs text-slate-500">${t().time}</p>
+          <p class="font-semibold text-sm text-white">${fmtH(totalMs)}</p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500">${t().sessions}</p>
+          <p class="font-semibold text-sm text-white">${sess.length}</p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500">${rt().predLabel}</p>
+          ${predCol}
         </div>
       </div>
-      <div class="text-center"><div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${pred.willPass?'bg-emerald-500/15 text-emerald-400':'bg-red-500/15 text-red-400'}">${pred.willPass?t('willPass'):t('willFail')}</div></div>
-      <div class="glass rounded-xl p-3 text-center">
-        <div class="text-xs text-slate-500 mb-1">${t('predGrade')}</div>
-        <div class="text-3xl font-bold text-${gc}-400">${pred.grade.toFixed(1)}</div>
-        <div class="text-xs text-slate-400 mt-0.5">${gLabel}</div>
-        <div class="w-full bg-slate-800 rounded-full h-1.5 mt-2"><div class="h-1.5 rounded-full bg-${gc}-500 transition-all" style="width:${barFill}%"></div></div>
-        <div class="flex justify-between text-xs text-slate-600 mt-1"><span>1,0 ★</span><span>4,0</span></div>
-      </div>
-      <div class="space-y-2">
-        ${renderFactor(t('timeCov'),Math.round(pred.timeFactor*100))}
-        ${renderFactor(t('scoreFac'),pred.avgScore)}
-        ${renderFactor(t('consist'),Math.round(pred.consistFactor*100))}
-      </div>
-      <div class="text-xs text-center text-slate-600">${t('confidence')}: <span class="text-slate-400">${pred.confidence}</span>${pred.confidence===pred.confLow?t('confLowHint'):''}</div>
-      <button onclick="openScoreModal('${sub.id}')" class="gradient-btn py-2 rounded-lg text-white text-xs font-medium">${t('addResultBtn')}</button>
     </div>`;
   }).join('');
 }
-function renderFactor(label,pct){
-  const c=pct>=70?'emerald':pct>=50?'cyan':pct>=30?'amber':'red';
-  return`<div><div class="flex justify-between text-xs mb-0.5"><span class="text-slate-500">${label}</span><span class="text-${c}-400">${pct}%</span></div><div class="w-full bg-slate-800 rounded-full h-1"><div class="h-1 rounded-full bg-${c}-500" style="width:${pct}%"></div></div></div>`;
-}
 
-// ═══════════════════════════════════════════════════════
-// ANALYTICS
-// ═══════════════════════════════════════════════════════
+// ─────────────────── ANALYTICS ───────────────────
 function renderAnalytics(){
-  const subjects=DB.subjects,sessions=DB.sessions;
-  Object.values(charts).forEach(c=>c.destroy());charts={};
-  const timeData=subjects.map(s=>sessions.filter(x=>x.subjectId===s.id).reduce((a,x)=>a+(x.duration||0),0)/3600);
-  const ctx1=document.getElementById('chart-time').getContext('2d');
-  charts.time=new Chart(ctx1,{type:'doughnut',data:{labels:subjects.map(s=>s.name),datasets:[{data:timeData,backgroundColor:['#7c3aed','#0891b2','#059669','#d97706','#dc2626','#be185d','#6366f1','#0e7490','#15803d','#b45309','#9f1239','#7e22ce'],borderWidth:0,hoverOffset:6}]},options:{plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},cutout:'65%'}});
-  const ctx2=document.getElementById('chart-progress').getContext('2d');
-  const gradeData=subjects.map(s=>predict(s).grade);
-  const barColors=gradeData.map(g=>{const c=gradeColor(g);return c==='emerald'?'rgba(16,185,129,.7)':c==='cyan'?'rgba(6,182,212,.7)':c==='amber'?'rgba(245,158,11,.7)':c==='orange'?'rgba(249,115,22,.7)':'rgba(239,68,68,.7)';});
-  charts.progress=new Chart(ctx2,{type:'bar',data:{labels:subjects.map(s=>s.name.length>12?s.name.slice(0,12)+'…':s.name),datasets:[{label:t('predictedGrade'),data:gradeData,backgroundColor:barColors,borderRadius:6,borderSkipped:false}]},options:{scales:{x:{ticks:{color:'#64748b'},grid:{color:'rgba(255,255,255,.04)'}},y:{min:1,max:5,ticks:{color:'#64748b',callback:v=>v.toFixed(1)},grid:{color:'rgba(255,255,255,.04)'},title:{display:true,text:'1.0 = beste Note',color:'#475569',font:{size:10}}}},plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}}}});
-  const ctx3=document.getElementById('chart-weekly').getContext('2d');
-  const days7=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d.toISOString().split('T')[0];});
-  const weekData=days7.map(d=>sessions.filter(s=>s.date===d).reduce((a,s)=>a+(s.duration||0),0)/3600);
-  const loc=currentLang==='de'?'de-DE':currentLang==='en'?'en-US':'fr-FR';
-  const weekLabels=days7.map(d=>new Date(d).toLocaleDateString(loc,{weekday:'short'}));
-  charts.weekly=new Chart(ctx3,{type:'bar',data:{labels:weekLabels,datasets:[{label:t('hours'),data:weekData,backgroundColor:'rgba(6,182,212,.6)',borderRadius:4,borderSkipped:false}]},options:{scales:{x:{ticks:{color:'#64748b'},grid:{display:false}},y:{ticks:{color:'#64748b'},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true}},plugins:{legend:{display:false}}}});
+  const subs=DB.subs();
+  const sess=DB.sess();
+  // Destroy old charts
+  Object.values(charts).forEach(c=>{ try{ c.destroy(); }catch(e){} });
+  charts={};
+  const chartDefaults={
+    color:'rgba(255,255,255,.7)',
+    borderColor:'rgba(255,255,255,.1)',
+  };
+  const gridColor='rgba(255,255,255,.05)';
+  const accent=getComputedStyle(document.body).getPropertyValue('--accent').trim()||'#8b5cf6';
+  const accent2=getComputedStyle(document.body).getPropertyValue('--accent2').trim()||'#06b6d4';
+
+  // Chart 1: Time per subject
+  const timeLabels=subs.map(s=>s.name.length>12?s.name.slice(0,12)+'…':s.name);
+  const timeData=subs.map(s=>+(sess.filter(x=>x.subId===s.id).reduce((a,x)=>a+x.duration,0)/3600000).toFixed(2));
+  const ctx1=document.getElementById('chart-time');
+  if(ctx1){
+    charts.time=new Chart(ctx1,{type:'bar',data:{labels:timeLabels,datasets:[{data:timeData,backgroundColor:'rgba(var(--accent-rgb),.4)',borderColor:accent,borderWidth:2,borderRadius:8,borderSkipped:false}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'rgba(255,255,255,.5)',font:{size:10}},grid:{color:gridColor}},y:{ticks:{color:'rgba(255,255,255,.5)',font:{size:10}},grid:{color:gridColor},beginAtZero:true}}}});
+  }
+
+  // Chart 2: Weekly activity
+  const days=[];
+  const dayLabels=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    days.push(d.toISOString().slice(0,10));
+    dayLabels.push(d.toLocaleDateString(currentLang==='fr'?'fr-FR':currentLang==='de'?'de-DE':'en-US',{weekday:'short'}));
+  }
+  const weekData=days.map(day=>{
+    const dayMs=sess.filter(s=>new Date(s.startTs).toISOString().slice(0,10)===day).reduce((a,s)=>a+s.duration,0);
+    return +(dayMs/3600000).toFixed(2);
+  });
+  const ctx2=document.getElementById('chart-weekly');
+  if(ctx2){
+    charts.weekly=new Chart(ctx2,{type:'line',data:{labels:dayLabels,datasets:[{data:weekData,borderColor:accent,backgroundColor:'rgba(var(--accent-rgb),.12)',fill:true,tension:0.4,pointBackgroundColor:accent,pointRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'rgba(255,255,255,.5)',font:{size:10}},grid:{color:gridColor}},y:{ticks:{color:'rgba(255,255,255,.5)',font:{size:10}},grid:{color:gridColor},beginAtZero:true}}}});
+  }
+
+  // Chart 3: Progress (grade or percent)
+  const isGrade=rt().predType==='grade';
+  const progLabels=subs.map(s=>s.name.length>12?s.name.slice(0,12)+'…':s.name);
+  const progData=subs.map(s=>{
+    const pd=predictDisplay(s);
+    return isGrade?pd.grade:pd.score;
+  });
+  const progColors=subs.map(s=>{
+    const pd=predictDisplay(s);
+    if(isGrade) return gradeColor(pd.grade);
+    return pd.score>=70?'#10b981':pd.score>=50?'#f59e0b':'#ef4444';
+  });
+  const ctx3=document.getElementById('chart-progress');
+  if(ctx3){
+    const yMin=isGrade?1:0, yMax=isGrade?4:100;
+    charts.progress=new Chart(ctx3,{type:'bar',data:{labels:progLabels,datasets:[{data:progData,backgroundColor:progColors.map(c=>c+'88'),borderColor:progColors,borderWidth:2,borderRadius:8,borderSkipped:false}]},options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{min:yMin,max:yMax,ticks:{color:'rgba(255,255,255,.5)',font:{size:10}},grid:{color:gridColor}},y:{ticks:{color:'rgba(255,255,255,.5)',font:{size:10}},grid:{display:false}}}}});
+  }
 }
 
-// ═══════════════════════════════════════════════════════
-// SUBJECT DETAIL
-// ═══════════════════════════════════════════════════════
-function openDetail(id){
-  const sub=DB.subjects.find(s=>s.id===id);if(!sub)return;
-  document.getElementById('detail-title').textContent=sub.name;
-  const sessions=DB.sessions.filter(s=>s.subjectId===id);
-  const scores=DB.scores.filter(s=>s.subjectId===id);
-  const pred=predict(sub),{pct,totalSec}=computeProgress(sub);
-  const modeMap={};t('modeKeys').forEach((k,i)=>modeMap[k]=t('modes')[i]);
-  const stMap={};t('scoreTypeKeys').forEach((k,i)=>stMap[k]=t('scoreTypes')[i]);
-  const gc=gradeColor(pred.grade),gLabel=gradeLabel(pred.grade,currentLang);
-  const loc=currentLang==='de'?'de-DE':currentLang==='en'?'en-US':'fr-FR';
-  document.getElementById('detail-content').innerHTML=`
-    <div class="grid md:grid-cols-2 gap-4 mb-4">
-      <div class="glass rounded-xl p-4 space-y-2">
-        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">${t('info')}</div>
-        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('category')}</span><span>${sub.category}</span></div>
-        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('difficulty')}</span><span>${t('diffs')[sub.difficulty-1]||''}</span></div>
-        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('targetH')}</span><span>${sub.targetHours}h</span></div>
-        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('passGrade')}</span><span>≤ 4,0</span></div>
-        ${sub.examDate?`<div class="flex justify-between text-sm"><span class="text-slate-500">${t('exam')}</span><span>${new Date(sub.examDate).toLocaleDateString(loc)}</span></div>`:''}
-        ${sub.desc?`<div class="text-xs text-slate-500 mt-1 pt-2 border-t border-white/5">${sub.desc}</div>`:''}
-      </div>
-      <div class="glass rounded-xl p-4 space-y-2">
-        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">${t('predTitle')}</div>
-        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('predGrade')}</span><span class="font-bold text-${gc}-400">${pred.grade.toFixed(1)} — ${gLabel}</span></div>
-        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('predChance')}</span><span class="font-bold ${pred.passProb>=70?'text-emerald-400':pred.passProb>=50?'text-amber-400':'text-red-400'}">${pred.passProb}%</span></div>
-        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('predVerdict')}</span><span class="${pred.willPass?'text-emerald-400':'text-red-400'}">${pred.willPass?t('verdictOk'):t('verdictKo')}</span></div>
-        <div class="flex justify-between text-sm"><span class="text-slate-500">${t('predConf')}</span><span>${pred.confidence}</span></div>
-      </div>
-    </div>
-    <div class="glass rounded-xl p-4 mb-4">
-      <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">${t('progressLabel')}</div>
-      <div class="flex justify-between text-xs text-slate-500 mb-1"><span>${fmtH(totalSec)} / ${sub.targetHours}h</span><span class="text-violet-400">${pct}%</span></div>
-      <div class="w-full bg-slate-800 rounded-full h-2"><div class="progress-bar h-2 rounded-full" style="width:${pct}%"></div></div>
-      <div class="text-xs text-slate-600 mt-1">${currentLang==='de'?'Kombiniert: Zeit (60%) + Score (40%)':currentLang==='en'?'Combined: Time (60%) + Score (40%)':'Combiné : Temps (60%) + Score (40%)'}</div>
-    </div>
-    <div class="grid md:grid-cols-2 gap-4 mb-4">
-      <div class="glass rounded-xl p-4">
-        <div class="flex items-center justify-between mb-2">
-          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">${t('results')} (${scores.length})</div>
-          <button onclick="openScoreModal('${id}')" class="text-xs text-violet-400 hover:text-violet-300">+ ${t('addResult')}</button>
+// ─────────────────── PREDICTIONS ───────────────────
+function renderPredictions(){
+  const subs=DB.subs();
+  const list=document.getElementById('predictions-list');
+  const noMsg=document.getElementById('no-pred-msg');
+  if(!subs.length){ list.innerHTML=''; noMsg.classList.remove('hidden'); return; }
+  noMsg.classList.add('hidden');
+  const isGrade=rt().predType==='grade';
+  list.innerHTML=subs.map(sub=>{
+    const pd=predictDisplay(sub);
+    let ringHTML='';
+    let verdictHTML='';
+    if(isGrade){
+      // Grade ring
+      const gc=gradeColor(pd.grade);
+      const r=44, circ=2*Math.PI*r;
+      const pct=1-(pd.grade-1)/3; // 1=full, 4=empty
+      const dash=pct*circ;
+      ringHTML=`<div class="grade-ring-wrap">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="${r}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="8"/>
+          <circle cx="50" cy="50" r="${r}" fill="none" stroke="${gc}" stroke-width="8"
+            stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"/>
+        </svg>
+        <div class="grade-ring-center">
+          <span class="text-2xl font-black" style="color:${gc}">${pd.grade.toFixed(1)}</span>
+          <span class="text-xs text-slate-500">${gradeLabel(pd.grade)}</span>
         </div>
-        ${scores.length?scores.slice().reverse().slice(0,5).map(sc=>`
-          <div class="flex justify-between items-center py-1.5 border-b border-white/5 text-sm">
-            <span class="text-slate-400 truncate mr-2">${stMap[sc.type]||sc.type}${sc.comment?` — ${sc.comment.slice(0,20)}`:''}</span>
-            <span class="font-semibold shrink-0 ${sc.value>=70?'text-emerald-400':sc.value>=50?'text-amber-400':'text-red-400'}">${sc.value}%</span>
-          </div>`).join(''):`<div class="text-slate-600 text-sm">${t('noSessions')}</div>`}
+      </div>`;
+      const pass=PASS_GRADES.includes(pd.grade);
+      verdictHTML=`<div class="text-center mt-2">
+        <span class="text-xs font-bold px-3 py-1 rounded-full" style="background:${pass?'rgba(16,185,129,.15)':'rgba(239,68,68,.15)'};color:${pass?'#10b981':'#ef4444'}">
+          ${pass?t().verdictOk:t().verdictKo}
+        </span>
+      </div>`;
+    } else {
+      // Percent ring
+      const sc=pd.score>=70?'#10b981':pd.score>=50?'#f59e0b':'#ef4444';
+      const r=44, circ=2*Math.PI*r, dash=(pd.score/100)*circ;
+      ringHTML=`<div class="percent-ring-wrap">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="${r}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="8"/>
+          <circle cx="50" cy="50" r="${r}" fill="none" stroke="${sc}" stroke-width="8"
+            stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"/>
+        </svg>
+        <div class="percent-ring-center">
+          <span class="text-2xl font-black" style="color:${sc}">${pd.score}%</span>
+          <span class="text-xs text-slate-500">${rt().predLabel}</span>
+        </div>
+      </div>`;
+      verdictHTML=`<div class="text-center mt-2">
+        <span class="text-xs font-bold px-3 py-1 rounded-full" style="background:${pd.success?'rgba(16,185,129,.15)':'rgba(239,68,68,.15)'};color:${pd.success?'#10b981':'#ef4444'}">
+          ${pd.success?'On track ✓':'At risk ✗'}
+        </span>
+      </div>`;
+    }
+    const confColor=pd.confidence==='high'?'#10b981':pd.confidence==='medium'?'#f59e0b':'#ef4444';
+    const confLabel=pd.confidence==='high'?t().confHigh:pd.confidence==='medium'?t().confMed:t().confLow;
+    return `<div class="glass-card p-5 space-y-3 fade-in">
+      <div class="flex items-center justify-between">
+        <h3 class="font-semibold text-white text-sm truncate flex-1">${sub.name}</h3>
+        <span class="text-xs px-2 py-0.5 rounded-full ml-2 flex-shrink-0" style="background:${confColor}20;color:${confColor}">${confLabel}</span>
       </div>
-      <div class="glass rounded-xl p-4">
-        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">${t('sessions')} (${sessions.length})</div>
-        ${sessions.length?sessions.slice().reverse().slice(0,5).map(s=>`
-          <div class="flex justify-between items-center py-1.5 border-b border-white/5 text-sm">
-            <span class="text-slate-400">${modeMap[s.mode]||s.mode}</span>
-            <span class="text-cyan-400">${fmt(s.duration||0)}</span>
-          </div>`).join(''):`<div class="text-slate-600 text-sm">${t('noSessions')}</div>`}
+      ${ringHTML}
+      ${verdictHTML}
+      <div class="grid grid-cols-3 gap-2 text-center text-xs pt-2 border-t border-white/5">
+        <div>
+          <p class="text-slate-500">${t().timeCov}</p>
+          <p class="font-semibold text-white">${pd.factors.time}%</p>
+        </div>
+        <div>
+          <p class="text-slate-500">${t().scoreFac}</p>
+          <p class="font-semibold text-white">${pd.factors.score}%</p>
+        </div>
+        <div>
+          <p class="text-slate-500">${t().consist}</p>
+          <p class="font-semibold text-white">${pd.factors.consist}%</p>
+        </div>
       </div>
-    </div>
-    <div class="flex gap-3 flex-wrap">
-      <button onclick="deleteSubject('${id}')" class="px-4 py-2 rounded-lg border border-red-500/30 text-red-400 text-sm hover:bg-red-500/10 transition">${t('delete')}</button>
-      <button onclick="closeModal('modal-detail');openScoreModal('${id}')" class="flex-1 gradient-btn py-2 rounded-lg text-white text-sm font-medium">${t('addResult')}</button>
-      <button onclick="closeModal('modal-detail');document.getElementById('session-subject').value='${id}';setTab('dashboard')" class="flex-1 py-2 rounded-lg border border-violet-500/30 text-violet-400 text-sm hover:bg-violet-500/10 transition">${t('startSess')}</button>
+      ${pd.confidence==='low'?`<p class="text-xs text-slate-600 text-center">${t().confLowHint}</p>`:''}
     </div>`;
-  document.getElementById('modal-detail').classList.remove('hidden');
+  }).join('');
 }
 
-function deleteSubject(id){
-  if(!confirm(t('deleteConfirm')))return;
-  DB.subjects=DB.subjects.filter(s=>s.id!==id);
-  DB.sessions=DB.sessions.filter(s=>s.subjectId!==id);
-  DB.scores=DB.scores.filter(s=>s.subjectId!==id);
-  closeModal('modal-detail');setTab('subjects');renderHeroStats();
-  toast(t('toastDeleted'),'red');
+// ─────────────────── TOAST ───────────────────
+function toast(msg, color='green'){
+  const container=document.getElementById('toast-container');
+  const el=document.createElement('div');
+  const c=color==='green'?'border-green-500/30 text-green-300':color==='red'?'border-red-500/30 text-red-300':color==='amber'?'border-amber-500/30 text-amber-300':'border-white/10 text-slate-200';
+  el.className=`toast border ${c}`;
+  el.textContent=msg;
+  container.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(100%)'; el.style.transition='all .3s'; setTimeout(()=>el.remove(),300); },2800);
 }
 
-// ═══════════════════════════════════════════════════════
-// MODALS
-// ═══════════════════════════════════════════════════════
-function openAddSubject(){document.getElementById('modal-subject').classList.remove('hidden');}
-function closeModal(id){document.getElementById(id).classList.add('hidden');}
-
-function saveSubject(){
-  const name=document.getElementById('sub-name').value.trim();
-  if(!name){toast(t('toastEnterName'),'amber');return;}
-  const sub={id:uid(),name,category:document.getElementById('sub-category').value,
-    difficulty:parseInt(document.getElementById('sub-difficulty').value),
-    targetHours:parseFloat(document.getElementById('sub-target-hours').value)||80,
-    examDate:document.getElementById('sub-exam-date').value,
-    desc:document.getElementById('sub-desc').value.trim(),createdAt:new Date().toISOString()};
-  DB.subjects=[...DB.subjects,sub];
-  closeModal('modal-subject');
-  document.getElementById('sub-name').value='';document.getElementById('sub-desc').value='';
-  renderHeroStats();populateSessionSubjectSelect();setTab('subjects');
-  toast(`"${sub.name}" ${t('toastAdded')}`);
-}
-
-function openScoreModal(subjectId){
-  document.getElementById('score-subject-id').value=subjectId;
-  document.getElementById('score-value').value=70;
-  document.getElementById('score-display').textContent='70%';
-  document.getElementById('score-comment').value='';
-  document.getElementById('modal-score').classList.remove('hidden');
-}
-
-function saveScore(){
-  const subjectId=document.getElementById('score-subject-id').value;
-  const value=parseInt(document.getElementById('score-value').value);
-  const type=document.getElementById('score-type').value;
-  const comment=document.getElementById('score-comment').value.trim();
-  DB.scores=[...DB.scores,{id:uid(),subjectId,value,type,comment,date:todayStr(),createdAt:new Date().toISOString()}];
-  closeModal('modal-score');renderHeroStats();
-  if(currentTab==='predictions')renderPredictions();
-  if(currentTab==='subjects')renderSubjects();
-  if(currentTab==='dashboard')renderRecentSessions();
-  if(currentTab==='analytics')renderAnalytics();
-  toast(t('toastScore'));
-}
+// ─────────────────── DOMCONTENTLOADED ───────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  const state=getAccessState();
+  if(state==='none') return; // license-screen visible by default
+  hideLicenseScreen();
+  if(state==='trial_expired'){ showLockedScreen(); return; }
+  // licensed or trial
+  currentRole=localStorage.getItem('sgp_role');
+  if(!currentRole){ openRoleScreen(); return; }
+  applyRoleTheme(currentRole);
+  document.getElementById('main-app').classList.remove('hidden');
+  initApp();
+  updateTrialBanner();
+});
 </script>
 </body>
 </html>
